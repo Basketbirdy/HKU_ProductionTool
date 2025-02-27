@@ -458,15 +458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10186b576bb8d6d49adecafe7f6d0c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorPairs:
-  - oldColors:
-    - {r: 0, g: 0, b: 0, a: 1}
-    - {r: 0.9607844, g: 0.627451, b: 0.5882353, a: 1}
-    - {r: 0.909804, g: 0.4156863, b: 0.45098042, a: 1}
-    newColors:
-    - {r: 0, g: 0, b: 0, a: 1}
-    - {r: 0, g: 0, b: 0, a: 1}
-    - {r: 0, g: 0, b: 0, a: 1}
+  colorPairs: []
 --- !u!212 &1351336956
 SpriteRenderer:
   m_ObjectHideFlags: 0
