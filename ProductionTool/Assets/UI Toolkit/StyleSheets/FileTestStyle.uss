@@ -1,0 +1,74 @@
+.header {
+    font-size: 40px;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/PatrickHand-Regular.ttf?fileID=12800000&guid=8c8b4e4fdd8775448bccd138079f9ed4&type=3#PatrickHand-Regular");
+    -unity-text-outline-width: 0;
+    -unity-text-outline-color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    align-self: stretch;
+    -unity-text-align: middle-center;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgba(0, 0, 0, 0.1);
+    border-right-color: rgba(0, 0, 0, 0.1);
+    border-top-color: rgba(0, 0, 0, 0.1);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+
+.button {
+    width: 200px;
+    -unity-text-align: upper-center;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/PatrickHand-Regular.ttf?fileID=12800000&guid=8c8b4e4fdd8775448bccd138079f9ed4&type=3#PatrickHand-Regular");
+    font-size: 24px;
+    align-self: auto;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-top-width: 8px;
+    border-right-width: 8px;
+    border-bottom-width: 8px;
+    border-left-width: 8px;
+    background-color: rgb(185, 185, 185);
+    transition-duration: 0.3s;
+}
+
+.fullscreen {
+    flex-grow: 1;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    background-color: rgb(166, 166, 166);
+    -unity-text-outline-width: 0;
+    align-self: stretch;
+}
+
+.button:hover {
+    width: 200px;
+    -unity-text-align: upper-center;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/PatrickHand-Regular.ttf?fileID=12800000&guid=8c8b4e4fdd8775448bccd138079f9ed4&type=3#PatrickHand-Regular");
+    font-size: 24px;
+    align-self: auto;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-top-width: 8px;
+    border-right-width: 8px;
+    border-bottom-width: 8px;
+    border-left-width: 8px;
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    scale: 1.1 1.1;
+    transition-duration: 0.5s, 1s;
+    background-color: rgb(149, 149, 149);
+    border-left-color: rgb(27, 27, 27);
+    border-right-color: rgb(27, 27, 27);
+    border-top-color: rgb(27, 27, 27);
+    border-bottom-color: rgb(27, 27, 27);
+    transition-property: background-color, border-color;
+}

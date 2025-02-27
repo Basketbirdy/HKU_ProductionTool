@@ -1,6 +1,0 @@
-.header {
-    align-self: center;
-    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&guid=19080fa2b7838d0449e022ab772cf905&type=3#NotInter-Regular");
-    -unity-font-style: bold;
-    margin-top: 0;
-}

@@ -1,0 +1,24 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/StyleSheets/FileTestStyle.uss?fileID=7433441132597879392&amp;guid=5ab2c3e135cbfa942b223dab6190d021&amp;type=3#FileTestStyle" />
+    <engine:VisualElement name="BackgroundElement" class="fullscreen" style="align-items: center;">
+        <engine:Label text="File management" class="header" style="padding-right: 10%; padding-left: 10%;" />
+        <engine:VisualElement name="Containers" style="flex-grow: 1; justify-content: space-between; width: 100%; height: auto; align-items: center; align-self: auto; padding-right: 10%; padding-left: 10%;">
+            <engine:VisualElement name="InputContainer" style="flex-grow: 1; width: 100%; height: auto;">
+                <engine:VisualElement name="ButtonContainer" style="flex-direction: row; justify-content: flex-start;">
+                    <engine:Button text="Load/Import" name="LoadButton" class="button" style="align-items: stretch; align-self: flex-start; justify-content: flex-start;" />
+                    <engine:Button text="Save&#10;" name="SaveButton" class="button" style="align-items: stretch; align-self: flex-start; justify-content: flex-start;" />
+                    <engine:Button text="Save as&#10;" name="SaveAsButton" class="button" style="align-items: stretch; align-self: flex-start; justify-content: flex-start;" />
+                </engine:VisualElement>
+                <engine:VisualElement name="TextContainer">
+                    <engine:TextField label="Text Field" placeholder-text="filler text" style="flex-direction: row; height: auto; white-space: normal; -unity-text-align: middle-left;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+            <engine:VisualElement name="OutputContainer" style="flex-grow: 1; align-self: stretch;">
+                <engine:VisualElement name="FilePath" style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-self: auto;">
+                    <engine:Label text="Path:" name="FilePathHeader" style="min-width: 150px;" />
+                    <engine:Label text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore " name="PathLabel" style="width: auto; align-content: flex-start; align-self: auto; flex-wrap: nowrap; white-space: normal; align-items: stretch; max-width: none; flex-shrink: 1; flex-grow: 1;" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
