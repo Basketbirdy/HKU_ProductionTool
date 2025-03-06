@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using SFB;
 
-public class FileManager : MonoBehaviour
+public class TestFileManager : MonoBehaviour
 {
     [SerializeField] private UIDocument document;
 

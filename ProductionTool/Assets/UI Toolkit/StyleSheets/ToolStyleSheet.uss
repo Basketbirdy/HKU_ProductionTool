@@ -1,0 +1,62 @@
+.button {
+    flex-shrink: 1;
+    flex-grow: 1;
+    align-self: stretch;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/Lexend-VariableFont_wght.ttf?fileID=12800000&guid=2e07b0bd6dbba3447810a1577ead809e&type=3#Lexend-VariableFont_wght");
+    -unity-font-style: normal;
+    font-size: 30px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    border-top-width: 8px;
+    border-right-width: 8px;
+    border-bottom-width: 8px;
+    border-left-width: 8px;
+    border-left-color: rgb(106, 106, 106);
+    border-right-color: rgb(106, 106, 106);
+    border-top-color: rgb(106, 106, 106);
+    border-bottom-color: rgb(106, 106, 106);
+    background-color: rgb(240, 240, 240);
+    transition-duration: 0.2s;
+}
+
+.column {
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+}
+
+.square-container {
+    padding-top: 0;
+    padding-bottom: 0;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: flex-start;
+}
+
+.column {
+    padding-top: 0;
+    padding-right: 20px;
+    padding-bottom: 0;
+    padding-left: 20px;
+}
+
+.square {
+    padding-top: 100%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.interactable {
+}
+
+.interactable:hover {
+    transition-duration: 0.2s;
+    border-left-color: rgb(167, 79, 60);
+    border-right-color: rgb(167, 79, 60);
+    border-top-color: rgb(167, 79, 60);
+    border-bottom-color: rgb(167, 79, 60);
+}
