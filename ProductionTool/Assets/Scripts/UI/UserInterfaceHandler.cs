@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using UnityEngine.U2D;
 using UnityEngine.UIElements;
 
 public class UserInterfaceHandler : MonoBehaviour
@@ -8,6 +11,7 @@ public class UserInterfaceHandler : MonoBehaviour
     private VisualElement root;
 
     Dictionary<string, Label> labels = new Dictionary<string, Label>();
+    Dictionary<string, TextField> textFields = new Dictionary<string, TextField>();
     Dictionary<string, VisualElement> visualElements = new Dictionary<string, VisualElement>();
     Dictionary<string, Button> buttons = new Dictionary<string, Button>();
 
@@ -16,6 +20,8 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if(instance == null) { instance = this; }
         else { Destroy(instance); }
+
+        root = document.rootVisualElement;
     }
 
     public void AddLabelRef(string key)
@@ -24,10 +30,27 @@ public class UserInterfaceHandler : MonoBehaviour
         Label value = root.Q<Label>(key);
         if (value != null) { labels.Add(key, value); }
     }
-    public void ChangeLabel(string key, string text)
+    public void SetLabel(string key, string text)
     {
         if (!labels.ContainsKey(key)) { return; }
         labels[key].text = text;
+    }
+
+    public void AddTextFieldRef(string key)
+    {
+        if (textFields.ContainsKey(key)) { return; }
+        TextField value = root.Q<TextField>(key);
+        if (value != null) { textFields.Add(key, value); }
+    }
+    public string GetTextFieldText(string key)
+    {
+        if (!textFields.ContainsKey(key)) { return null; }
+        return textFields[key].text;
+    }
+    public void SetTextFieldLabel(string key, string text)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields[key].label = text;
     }
 
     public void AddVisualElementRef(string key)
@@ -45,6 +68,16 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if (!visualElements.ContainsKey(key)) { return; }
         visualElements[key].style.display = DisplayStyle.None;
+    }
+    public void AssignVisualElementBackground(string key, Texture2D texture)
+    {
+        if (!visualElements.ContainsKey(key)) { return; }
+        visualElements[key].style.backgroundImage = texture;
+    }
+    public void AssignVisualElementBackground(string key, Sprite sprite)
+    {
+        if (!visualElements.ContainsKey(key)) { return; }
+        visualElements[key].style.backgroundImage = new StyleBackground(sprite);
     }
 
     public void AddButtonRef(string key)

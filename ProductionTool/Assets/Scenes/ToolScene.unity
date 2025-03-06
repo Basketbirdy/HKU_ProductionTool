@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 757528948}
   - component: {fileID: 757528949}
+  - component: {fileID: 757528950}
   m_Layer: 0
   m_Name: UserInterface
   m_TagString: Untagged
@@ -170,6 +171,19 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!114 &757528950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 757528947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f8e1f1e18db0fd42b10435b285c4219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  document: {fileID: 757528949}
 --- !u!1 &1250695238
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,27 +193,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1250695240}
-  - component: {fileID: 1250695239}
+  - component: {fileID: 1250695241}
   m_Layer: 0
-  m_Name: DataManager
+  m_Name: FileManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1250695239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1250695238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 665bae6ba56d0bd48990472e6c3ac7d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  importButtonId: Button_Import
 --- !u!4 &1250695240
 Transform:
   m_ObjectHideFlags: 0
@@ -215,6 +216,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1250695241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250695238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bd1aca247f7dc24692bc761b7ce349f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  importButtonId: Button_Import
 --- !u!1 &1397921885
 GameObject:
   m_ObjectHideFlags: 0
