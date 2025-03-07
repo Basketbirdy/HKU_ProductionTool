@@ -25,12 +25,14 @@ namespace FileManagement
             Debug.LogWarning($"TODO - Implement creating fresh project data");
 
             // create metadata
-            DataHeader metaData = new DataHeader(defaultData.metaData);
+            DataHeader metaData = (DataHeader)ScriptableObject.CreateInstance("DataHeader");
+            metaData.OnCreateDataHeader(defaultData.metaData);
             metaData.version = version;
             metaData.date = System.DateTime.Now.ToString();
 
             // create data instance
-            DataHolder newProjectData = new DataHolder(defaultData);
+            DataHolder newProjectData = (DataHolder)ScriptableObject.CreateInstance("DataHolder");
+            newProjectData.OnCreateDataHolder(defaultData);
             newProjectData.metaData = metaData;
 
             newProjectData.fileName = Path.GetFileName(url);

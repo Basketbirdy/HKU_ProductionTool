@@ -14,7 +14,7 @@ public class FileManagerEditor : Editor
 
         GUILayout.Space(20);
         GUILayout.Label("Version");
-        EditorGUILayout.TextArea(fileManager.CurrentVersion);
+        EditorGUILayout.LabelField(fileManager.CurrentVersion);
         GUILayout.Space(10);
         if (GUILayout.Button("Increment Major Version")) { fileManager.IncrementMajorVersion(); }
         if (GUILayout.Button("Decrement Major Version")) { fileManager.DecrementMajorVersion(); }
@@ -28,7 +28,7 @@ public class FileManagerEditor : Editor
         GUILayout.Space(20);
         GUILayout.Label("Debugging");
         GUILayout.Space(10);
-        if(GUILayout.Button("Print Data Colors")) { fileManager.PrintDataColors(); }
-        
+        if(GUILayout.Button("Print Data")) { fileManager.PrintData(); }
+
     }
 }

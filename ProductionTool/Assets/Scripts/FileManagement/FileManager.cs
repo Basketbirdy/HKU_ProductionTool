@@ -9,9 +9,9 @@ namespace FileManagement
     {
         [Header("MetaData")]
         [SerializeField] private DataHolder defaultData;
-        private int majorVersion = 0;
-        private int minorVersion = 0;
-        private int patchVersion = 0;
+        [HideInInspector] [SerializeField] private int majorVersion; // Serializing the field stops the int from resetting in playmode,
+        [HideInInspector] [SerializeField] private int minorVersion;    // allowing me to change it in editor with the custom editor
+        [HideInInspector] [SerializeField] private int patchVersion;
         public string CurrentVersion => string.Join(".", majorVersion, minorVersion, patchVersion);
 
         [Header("Importing")]
@@ -126,8 +126,16 @@ namespace FileManagement
         public void DecrementMinorVersion() { minorVersion--; }
         public void IncrementPatchVersion() { patchVersion++; }
         public void DecrementPatchVersion() { patchVersion--; }
-        public void PrintDataColors()
+        public void PrintData()
         {
+            if(currentData == null) { return; }
+
+            Debug.Log($"Filename: {currentData.fileName}");
+            Debug.Log($"-----------Metadata-------------");
+            Debug.Log($"version: {currentData.metaData.version}");
+            Debug.Log($"Date: {currentData.metaData.date}");
+            Debug.Log($"--------------------------------");
+
             int count = 0;
             foreach(Color color in currentData.originalColors)
             {

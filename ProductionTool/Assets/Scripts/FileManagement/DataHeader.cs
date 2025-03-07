@@ -12,4 +12,10 @@ public class DataHeader : ScriptableObject
         version = defaultDataHeader.version;
         date = DateTime.Now.ToString();
     }
+
+    public void OnCreateDataHeader(DataHeader defaultDataHeader)
+    {
+        version = defaultDataHeader.version;
+        date = DateTime.Now.ToString();
+    }
 }

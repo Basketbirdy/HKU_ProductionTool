@@ -23,5 +23,12 @@ namespace FileManagement
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
         }
+
+        public void OnCreateDataHolder(DataHolder defaultData)
+        {
+            metaData = defaultData.metaData;
+            fileName = defaultData.fileName;
+            originalTexture = defaultData.originalTexture;
+        }
     }
 }
