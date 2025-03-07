@@ -1,11 +1,25 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
-public class DataHandler
+namespace FileManagement
 {
-    public DataHandler() 
+    public class DataHandler
     {
-        
-    }
+        public DataHandler() 
+        {
+            
+        }
 
-    private ProjectSettings projectSettings;
+        /// <summary>
+        /// method that creates a fresh new instance of data with default values
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public DataHolder CreateFreshProject(string url)
+        {
+            // TODO - create instance of SavaData class filled with default values and provided image
+            Debug.LogWarning($"TODO - Implement creating fresh project data");
+            return null;
+        }
+    }
 }

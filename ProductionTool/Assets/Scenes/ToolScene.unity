@@ -229,6 +229,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   importButtonId: Button_Import
+  shader: {fileID: 4800000, guid: 625491346d4930d49b8d0ecc2a0d4a72, type: 3}
+  oldColor: {r: 0.078431375, g: 0.0627451, b: 0.07450981, a: 1}
+  newColor: {r: 0.14117648, g: 0.15294118, b: 0.17254902, a: 1}
 --- !u!1 &1397921885
 GameObject:
   m_ObjectHideFlags: 0
