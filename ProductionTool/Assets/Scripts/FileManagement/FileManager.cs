@@ -7,13 +7,20 @@ namespace FileManagement
 {
     public class FileManager : MonoBehaviour
     {
+        [Header("MetaData")]
+        [SerializeField] private DataHolder defaultData;
+        private int majorVersion = 0;
+        private int minorVersion = 0;
+        private int patchVersion = 0;
+        public string CurrentVersion => string.Join(".", majorVersion, minorVersion, patchVersion);
+
         [Header("Importing")]
         [SerializeField] private string importButtonId;
         private ImportHandler importHandler;
 
         [Header("Project")]
         private DataHandler dataHandler;
-        private DataHolder currentData;
+        [SerializeField] private DataHolder currentData;
 
         [Header("Shader")]
         [SerializeField] private Shader shader;
@@ -28,14 +35,14 @@ namespace FileManagement
         private ExportHandler exportHandler;
 
         [Header("User Interface Ids")]
-        [SerializeField] private string originalSpriteId = "Sprite_Processed";
-        [SerializeField] private string processedSpriteId = "Sprite_Original";
+        [SerializeField] private string originalSpriteId = "Sprite_Original";
+        [SerializeField] private string processedSpriteId = "Sprite_Processed";
         [SerializeField] private string filenameLabelId = "Label_Filename";
 
         private void Awake()
         {
             importHandler = new ImportHandler(importButtonId, shaderMaterial, shader);
-            dataHandler = new DataHandler();
+            dataHandler = new DataHandler(defaultData);
             saveHandler = new SaveHandler();
             exportHandler = new ExportHandler();
 
@@ -49,7 +56,7 @@ namespace FileManagement
 
             UserInterfaceHandler.instance.AddVisualElementRef(originalSpriteId);
             UserInterfaceHandler.instance.AddVisualElementRef(processedSpriteId);
-            UserInterfaceHandler.instance.AddLabelRef(originalSpriteId);
+            UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
 
             shaderMaterial.SetColor("_OldColor", oldColor);
             shaderMaterial.SetColor("_NewColor", newColor);
@@ -62,6 +69,7 @@ namespace FileManagement
 
         private void OnImportButtonPressed()
         {
+            // select file
             var extensions = new[] {
                 new ExtensionFilter("Image Files", "png", "jpg", "jpeg" ),
                 new ExtensionFilter("Project Files", "cosw")
@@ -70,16 +78,25 @@ namespace FileManagement
             if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
             Debug.Log($"Path selected: {url[0]}; File extension: {Path.GetExtension(url[0])}");
 
+            // check file extension
             string extension = Path.GetExtension(url[0]);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
             {
-                currentData = dataHandler.CreateFreshProject(url[0]);
+                currentData = dataHandler.CreateFreshProject(url[0], CurrentVersion);
             }
-            else
+            else if(extension == ".cosw")
             {
                 currentData = importHandler.ImportExistingProject(url[0]);
             }
+            else
+            {
+                Debug.LogWarning("Unsupported file type!");
+                return;
+            }
+
+            UpdateUserInterface(currentData);
         }
+
         private void OnSaveButtonPressed()
         {
 
@@ -89,5 +106,25 @@ namespace FileManagement
         {
 
         }
+
+
+        private void UpdateUserInterface(DataHolder data)
+        {
+            UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
+
+            Texture2D processedTexture = TextureUtils.GetShaderTexture(data.originalTexture, shaderMaterial);
+            processedTexture.filterMode = FilterMode.Point;
+            UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
+
+            UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
+        }
+
+        // editor button methods
+        public void IncrementMajorVersion() { majorVersion++; }
+        public void DecrementMajorVersion() { majorVersion--; }
+        public void IncrementMinorVersion() { minorVersion++; }
+        public void DecrementMinorVersion() { minorVersion--; }
+        public void IncrementPatchVersion() { patchVersion++; }
+        public void DecrementPatchVersion() { patchVersion--; }
     }
 }

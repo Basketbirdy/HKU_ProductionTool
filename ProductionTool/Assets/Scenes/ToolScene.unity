@@ -228,10 +228,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bd1aca247f7dc24692bc761b7ce349f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultData: {fileID: 11400000, guid: 69c1a5b898854234e9b789e0b00e295d, type: 2}
   importButtonId: Button_Import
+  currentData: {fileID: 0}
   shader: {fileID: 4800000, guid: 625491346d4930d49b8d0ecc2a0d4a72, type: 3}
   oldColor: {r: 0.078431375, g: 0.0627451, b: 0.07450981, a: 1}
   newColor: {r: 0.14117648, g: 0.15294118, b: 0.17254902, a: 1}
+  originalSpriteId: Sprite_Original
+  processedSpriteId: Sprite_Processed
+  filenameLabelId: Label_Filename
 --- !u!1 &1397921885
 GameObject:
   m_ObjectHideFlags: 0

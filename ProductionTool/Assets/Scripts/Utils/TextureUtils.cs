@@ -19,7 +19,22 @@ public static class TextureUtils
         {
             return null;
         }
-    }   
+    }
+    public static Texture2D LoadImage(byte[] bytes)
+    {
+        if (bytes.Length != 0)
+        {
+            Texture2D texture = new Texture2D(2, 2);
+            texture.LoadImage(bytes);
+            texture.filterMode = FilterMode.Point;
+
+            return texture;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public static Texture2D GetShaderTexture(Texture2D inputTexture, Shader shader)
     {

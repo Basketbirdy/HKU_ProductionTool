@@ -2,23 +2,24 @@ using UnityEngine;
 
 namespace FileManagement
 {
-    public class DataHolder
+    [System.Serializable]
+    [CreateAssetMenu(fileName = "NewData", menuName = "ScriptableObjects/Data")]
+    public class DataHolder : ScriptableObject
     {
-        private HeaderData metaData;
-        private HeaderData defaultData;
+        // meta data
+        public DataHeader metaData;
 
-        private Texture2D originalTexture;
-    }
+        [Space]
 
+        // instance data
+        public string fileName;
+        public Texture2D originalTexture;
 
-    [CreateAssetMenu(fileName = "NewHeaderData", menuName = "ScriptableObjects/HeaderData")]
-    public class HeaderData : ScriptableObject
-    {
-        public string version;
-
-        public HeaderData(string version)
+        public DataHolder(DataHolder defaultData) 
         {
-            this.version = version;
+            metaData = defaultData.metaData;
+            fileName = defaultData.fileName;
+            originalTexture = defaultData.originalTexture;
         }
     }
 }
