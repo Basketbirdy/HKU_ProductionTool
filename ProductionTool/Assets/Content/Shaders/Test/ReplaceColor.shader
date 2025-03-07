@@ -55,7 +55,7 @@ Shader "Unlit/ReplaceColor"
 
                 float distance = dot(col.rgb - _OldColor.rgb, col.rgb - _OldColor.rgb);
 
-                if(distance < 0.01f && col.a > 0.0f)
+                if(distance < 0.001f && col.a > 0.0f)
                 {
                     return _NewColor;
                 }

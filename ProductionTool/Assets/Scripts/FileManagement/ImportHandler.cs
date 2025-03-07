@@ -9,9 +9,16 @@ public class ImportHandler
 {
     private string importButtonId;
 
-    public ImportHandler(string importButtonId)
+    // temp
+    private Material shaderMaterial;
+    private Shader shader;
+
+    public ImportHandler(string importButtonId, Material shaderMaterial, Shader shader)
     {
         this.importButtonId = importButtonId;
+
+        this.shaderMaterial = shaderMaterial;
+        this.shader = shader;
 
         UserInterfaceHandler.instance.AddButtonRef(importButtonId);
         UserInterfaceHandler.instance.AddButtonListener(importButtonId, OnImport);
@@ -57,11 +64,13 @@ public class ImportHandler
         Debug.LogWarning("Creating new project not implemented yet!");
         // TODO - Create a project and update ui somewhere else based on updated project data
         // get data
-        Texture2D texture = FileUtils.LoadImage(url);
+        Texture2D texture = TextureUtils.LoadImage(url);
+        Texture2D shaderTexture = TextureUtils.GetShaderTexture(texture, shaderMaterial);
+        shaderTexture.filterMode = FilterMode.Point;
 
         // update user interface
         UserInterfaceHandler.instance.AssignVisualElementBackground("OriginalSprite", texture);
-        UserInterfaceHandler.instance.AssignVisualElementBackground("UpdatedSprite", texture);
+        UserInterfaceHandler.instance.AssignVisualElementBackground("UpdatedSprite", shaderTexture);
 
         string fileName = Path.GetFileName(url);
         UserInterfaceHandler.instance.SetLabel("Label_Filename", fileName);
