@@ -61,3 +61,44 @@
     border-top-color: rgb(167, 79, 60);
     border-bottom-color: rgb(167, 79, 60);
 }
+
+.unity-base-field {
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/Lexend-VariableFont_wght.ttf?fileID=12800000&guid=2e07b0bd6dbba3447810a1577ead809e&type=3#Lexend-VariableFont_wght");
+    font-size: 30px;
+    -unity-text-align: middle-center;
+    -unity-font-style: normal;
+    flex-grow: 1;
+    width: auto;
+}
+
+.unity-base-popup-field {
+    border-top-width: 8px;
+    border-right-width: 8px;
+    border-bottom-width: 8px;
+    border-left-width: 8px;
+    border-left-color: rgb(106, 106, 106);
+    border-right-color: rgb(106, 106, 106);
+    border-top-color: rgb(106, 106, 106);
+    border-bottom-color: rgb(106, 106, 106);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    flex-grow: 1;
+}
+
+.unity-popup-field {
+    border-left-color: rgb(106, 106, 106);
+    border-right-color: rgb(106, 106, 106);
+    border-top-color: rgb(106, 106, 106);
+    border-bottom-color: rgb(106, 106, 106);
+    border-top-width: 8px;
+    border-right-width: 8px;
+    border-bottom-width: 8px;
+    border-left-width: 8px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+    flex-grow: 1;
+}
