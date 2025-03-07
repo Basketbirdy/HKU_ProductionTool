@@ -126,5 +126,14 @@ namespace FileManagement
         public void DecrementMinorVersion() { minorVersion--; }
         public void IncrementPatchVersion() { patchVersion++; }
         public void DecrementPatchVersion() { patchVersion--; }
+        public void PrintDataColors()
+        {
+            int count = 0;
+            foreach(Color color in currentData.originalColors)
+            {
+                Debug.Log($"[{count}] {color}");
+                count++;
+            }
+        }
     }
 }

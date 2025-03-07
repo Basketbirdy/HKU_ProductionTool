@@ -1,7 +1,5 @@
-using JetBrains.Annotations;
-using System;
+using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace FileManagement
@@ -29,7 +27,7 @@ namespace FileManagement
             // create metadata
             DataHeader metaData = new DataHeader(defaultData.metaData);
             metaData.version = version;
-            metaData.date = DateTime.Now.ToString();
+            metaData.date = System.DateTime.Now.ToString();
 
             // create data instance
             DataHolder newProjectData = new DataHolder(defaultData);
@@ -38,7 +36,24 @@ namespace FileManagement
             newProjectData.fileName = Path.GetFileName(url);
             newProjectData.originalTexture = TextureUtils.LoadImage(url);
 
+            // identify and store all unique colors
+            newProjectData.originalColors = GetUniqueColors(newProjectData.originalTexture);
+
             return newProjectData;
+        }
+
+        private HashSet<Color> GetUniqueColors(Texture2D texture)
+        {
+            Color[] pixels = texture.GetPixels();
+
+            HashSet<Color> colors = new HashSet<Color>(); // hashset because duplicates get ignored
+            
+            for(int i = 0; i < pixels.Length; i++)
+            {
+                colors.Add(pixels[i]);
+            }
+
+            return colors;
         }
     }
 }

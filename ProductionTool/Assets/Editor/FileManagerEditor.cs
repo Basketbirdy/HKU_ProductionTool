@@ -24,5 +24,11 @@ public class FileManagerEditor : Editor
         GUILayout.Space(10);
         if (GUILayout.Button("Increment Patch Version")) { fileManager.IncrementPatchVersion(); }
         if (GUILayout.Button("Decrement Patch Version")) { fileManager.DecrementPatchVersion(); }
+
+        GUILayout.Space(20);
+        GUILayout.Label("Debugging");
+        GUILayout.Space(10);
+        if(GUILayout.Button("Print Data Colors")) { fileManager.PrintDataColors(); }
+        
     }
 }

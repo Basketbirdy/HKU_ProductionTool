@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace FileManagement
 {
@@ -14,6 +15,7 @@ namespace FileManagement
         // instance data
         public string fileName;
         public Texture2D originalTexture;
+        public HashSet<Color> originalColors = new HashSet<Color>();
 
         public DataHolder(DataHolder defaultData) 
         {
