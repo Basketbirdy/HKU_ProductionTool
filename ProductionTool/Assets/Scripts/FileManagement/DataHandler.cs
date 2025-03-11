@@ -42,6 +42,9 @@ namespace FileManagement
             // identify and store all unique colors
             newProjectData.originalColors = TextureUtils.GetUniqueColors(newProjectData.originalTexture);
 
+            newProjectData.colorVariants = new List<ColorVariant>();
+            newProjectData.colorVariants.Add(new ColorVariant("DefaultVariant", newProjectData.originalColors));
+
             return newProjectData;
         }
     }

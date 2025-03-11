@@ -32,6 +32,7 @@ namespace FileManagement
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
 
+            colorVariants = defaultData.colorVariants;
             exportOptions = defaultData.exportOptions;
         }
 
