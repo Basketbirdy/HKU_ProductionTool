@@ -29,9 +29,9 @@
             </engine:VisualElement>
             <engine:VisualElement name="ExportingArea" style="flex-grow: 1; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; flex-direction: row; justify-content: flex-start; width: 100%; align-items: stretch;">
                 <engine:Button text="Export" name="Button_Export" class="button interactable" style="width: 20%; flex-grow: 0;" />
-                <engine:VisualElement style="flex-grow: 0; flex-direction: row; width: 80%;">
-                    <engine:DropdownField choices="Selected,Seperate,SpriteSheet" index="0" style="width: 60%; flex-shrink: 1;" />
-                    <engine:DropdownField choices="PNG,JPG,JPEG" index="0" style="flex-shrink: 1; width: 40%;" />
+                <engine:VisualElement name="DropdownArea" style="flex-grow: 0; flex-direction: row; width: 80%;">
+                    <engine:DropdownField choices="Selected,All,SpriteSheet" index="0" name="Dropdown_ExportContent" style="width: 60%; flex-shrink: 1;" />
+                    <engine:DropdownField choices="PNG,JPG,JPEG" index="0" name="Dropdown_ExportFiletype" style="flex-shrink: 1; width: 40%;" />
                 </engine:VisualElement>
             </engine:VisualElement>
         </engine:VisualElement>

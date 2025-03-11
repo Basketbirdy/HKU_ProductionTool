@@ -1,8 +1,6 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.U2D;
 using UnityEngine.UIElements;
 
 public class UserInterfaceHandler : MonoBehaviour
@@ -14,6 +12,7 @@ public class UserInterfaceHandler : MonoBehaviour
     Dictionary<string, TextField> textFields = new Dictionary<string, TextField>();
     Dictionary<string, VisualElement> visualElements = new Dictionary<string, VisualElement>();
     Dictionary<string, Button> buttons = new Dictionary<string, Button>();
+    Dictionary<string, DropdownField> dropdowns = new Dictionary<string, DropdownField>();
 
     public static UserInterfaceHandler instance;
     private void Awake()
@@ -95,5 +94,27 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if (!buttons.ContainsKey(key)) { return; }
         buttons[key].clicked -= action;
+    }
+
+    public void AddDropdownRef(string key)
+    {
+        if(dropdowns.ContainsKey(key)) { return; }
+        DropdownField value = root.Q<DropdownField>(key);
+        if(value != null) { dropdowns.Add(key, value); }
+    }
+    public int GetDropdownValue(string key)
+    {
+        if (!dropdowns.ContainsKey(key)) { return -1; }
+        return dropdowns[key].index;
+    }
+    public void AddDropdownListener(string key, Action<ChangeEvent<string>> action)
+    {
+        if (!dropdowns.ContainsKey(key)) { return; }
+        dropdowns[key].RegisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+    public void RemoveDropdownListener(string key, Action<ChangeEvent<string>> action)
+    {
+        if (!dropdowns.ContainsKey(key)) { return; }
+        dropdowns[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
     }
 }

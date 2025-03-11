@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace FileManagement
 {
@@ -35,7 +36,7 @@ namespace FileManagement
         [Header("Exporting")]
         [SerializeField] private string exportButtonId = "Button_Export";
         [SerializeField] private string exportContentDropdownId = "Dropdown_ExportContent";
-        [SerializeField] private string exportFileTypeId = "Dropdown_ExportFileType";
+        [SerializeField] private string exportFiletypeDropdownId = "Dropdown_ExportFiletype";
         private ExportHandler exportHandler;
 
         [Header("Dynamic User Interface Ids")]
@@ -55,14 +56,24 @@ namespace FileManagement
 
         private void Start()
         {
+            // static ui
+                // buttons
             UserInterfaceHandler.instance.AddButtonRef(importButtonId);
             UserInterfaceHandler.instance.AddButtonListener(importButtonId, OnImportButtonPressed);
 
             UserInterfaceHandler.instance.AddButtonRef(exportButtonId);
             UserInterfaceHandler.instance.AddButtonListener(exportButtonId, OnExportButtonPressed);
+                // dropdowns
+            UserInterfaceHandler.instance.AddDropdownRef(exportContentDropdownId);
+            UserInterfaceHandler.instance.AddDropdownListener(exportContentDropdownId, OnExportContentChange);
+            UserInterfaceHandler.instance.AddDropdownRef(exportFiletypeDropdownId);
+            UserInterfaceHandler.instance.AddDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
 
+            // dynamic ui
+                // visual elements - images
             UserInterfaceHandler.instance.AddVisualElementRef(originalSpriteId);
             UserInterfaceHandler.instance.AddVisualElementRef(processedSpriteId);
+                // labels - text
             UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
 
             shaderMaterial.SetColor("_OldColor", oldColor);
@@ -71,8 +82,13 @@ namespace FileManagement
 
         private void OnDisable()
         {
+            // static ui
+                // buttons
             UserInterfaceHandler.instance.RemoveButtonListener(importButtonId, OnImportButtonPressed);
             UserInterfaceHandler.instance.RemoveButtonListener(exportButtonId, OnExportButtonPressed);
+                // dropdowns
+            UserInterfaceHandler.instance.RemoveDropdownListener(exportContentDropdownId, OnExportContentChange);
+            UserInterfaceHandler.instance.RemoveDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
         }
 
         private void OnImportButtonPressed()
@@ -142,6 +158,47 @@ namespace FileManagement
             }
 
             exportHandler.Export(url, texturesToExport, exportOptions.fileType);
+        }
+
+        private void OnExportContentChange(ChangeEvent<string> evt)
+        {
+            if(currentData == null) { return; }
+
+            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(exportContentDropdownId);
+
+            switch(selectedIndex)
+            {
+                case 0: // selected
+                    currentData.exportOptions.content = ExportContent.SELECTED;
+                    break;
+                case 1: // all
+                    currentData.exportOptions.content = ExportContent.ALL;
+                    break;
+                case 2: // spritesheet
+                    currentData.exportOptions.content = ExportContent.SPRITESHEET;
+                    break;
+            }
+
+            Debug.Log($"CurrentData export settings; content: {currentData.exportOptions.content}, filetype: {currentData.exportOptions.fileType}");
+        }
+
+        private void OnExportFiletypeChange(ChangeEvent<string> evt)
+        {
+            if (currentData == null) { return; }
+
+            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(exportFiletypeDropdownId);
+
+            switch (selectedIndex)
+            {
+                case 0: // png
+                    currentData.exportOptions.fileType = FileType.PNG;
+                    break;
+                case 1: // jpg
+                    currentData.exportOptions.fileType = FileType.JPG;
+                    break;
+            }
+
+            Debug.Log($"CurrentData export settings; content: {currentData.exportOptions.content}, filetype: {currentData.exportOptions.fileType}");
         }
 
         private Texture2D[] GetSelectedTexture()
