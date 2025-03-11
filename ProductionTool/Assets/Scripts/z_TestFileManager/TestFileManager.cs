@@ -110,6 +110,7 @@ public class TestFileManager : MonoBehaviour
             }
         }
 
+        Debug.Log($"Url selected: {url}");
         CreateTxtFile(inputText.text, url);
     }
     private void OnSaveAsButtonClicked()

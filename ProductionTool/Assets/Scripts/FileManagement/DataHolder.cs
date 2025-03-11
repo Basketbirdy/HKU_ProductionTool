@@ -12,16 +12,27 @@ namespace FileManagement
 
         [Space]
 
-        // instance data
+        [Header("Instance data")]
         public string fileName;
         public Texture2D originalTexture;
-        public HashSet<Color> originalColors = new HashSet<Color>();
+        public Color[] originalColors;
+
+        // variants
+        public List<ColorVariant> colorVariants = new List<ColorVariant>();
+
+        [Header("State data")]
+        public int selectedIndex;
+
+        // options
+        public ExportOptions exportOptions;
 
         public DataHolder(DataHolder defaultData) 
         {
             metaData = defaultData.metaData;
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
+
+            exportOptions = defaultData.exportOptions;
         }
 
         public void OnCreateDataHolder(DataHolder defaultData)

@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.IO;
-using UnityEngine.Rendering;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 
 public static class TextureUtils
 {
@@ -78,5 +80,75 @@ public static class TextureUtils
         renderTexture.Release();
 
         return processedTexture;
+    }
+
+    public static Texture2D CreateTextureSheet(Texture2D[] textures)
+    {
+        // determine amount of columns and rows to fit all textures inside a square
+        int columns = Mathf.CeilToInt(Mathf.Sqrt(textures.Length));
+        int rows = Mathf.CeilToInt((float)textures.Length / columns);
+
+        // determine individual texture dimensions
+        // every texture should have the same dimensions
+        int textureWidth = textures[0].width;
+        int textureHeight = textures[0].height;
+
+        // calculate spritesheet dimensions (no padding)
+        int sheetWidth = columns * textureWidth;
+        int sheetHeight = rows * textureHeight;
+
+        // create sprite sheet texture
+        Texture2D sheetTexture = new Texture2D(sheetWidth, sheetHeight);
+        sheetTexture.filterMode = FilterMode.Point;
+        sheetTexture.filterMode = FilterMode.Point;
+
+        // make texture fully transparent
+        Color transparent = new Color(0,0,0,0);
+        Color[] pixels = new Color[sheetTexture.width * sheetTexture.height];
+        for (var i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = transparent;
+        }
+        sheetTexture.SetPixels(pixels);
+        sheetTexture.Apply();
+
+        // allign textures in sheet
+        for (int i = 0; i < textures.Length; i++)
+        {
+            int columnPos = i % columns;
+            int rowPos = i / columns;
+
+            int xPos = columnPos * textureWidth;
+            int yPos = rowPos * textureHeight;
+
+            // Ensure we're within bounds
+            if (xPos + textureWidth <= sheetWidth && yPos + textureHeight <= sheetHeight)
+            {
+                // Copy the pixels from the current texture to the correct position in the spritesheet
+                sheetTexture.SetPixels(xPos, yPos, textureWidth, textureHeight, textures[i].GetPixels());
+            }
+            else
+            {
+                Debug.LogError($"Error: Texture {i} exceeds spritesheet bounds.");
+            }
+        }
+
+        sheetTexture.Apply();
+
+        return sheetTexture;
+    }
+
+    public static Color[] GetUniqueColors(Texture2D texture)
+    {
+        Color[] pixels = texture.GetPixels();
+
+        HashSet<Color> colors = new HashSet<Color>(); // hashset because duplicates get ignored
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            colors.Add(pixels[i]);
+        }
+
+        return colors.ToArray(); // returns an array so the indexes are known
     }
 }

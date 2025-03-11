@@ -1,6 +1,7 @@
 using SFB;
+using System;
 using System.IO;
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FileManagement
@@ -32,16 +33,19 @@ namespace FileManagement
         private SaveHandler saveHandler;
 
         [Header("Exporting")]
+        [SerializeField] private string exportButtonId = "Button_Export";
+        [SerializeField] private string exportContentDropdownId = "Dropdown_ExportContent";
+        [SerializeField] private string exportFileTypeId = "Dropdown_ExportFileType";
         private ExportHandler exportHandler;
 
-        [Header("User Interface Ids")]
+        [Header("Dynamic User Interface Ids")]
         [SerializeField] private string originalSpriteId = "Sprite_Original";
         [SerializeField] private string processedSpriteId = "Sprite_Processed";
         [SerializeField] private string filenameLabelId = "Label_Filename";
 
         private void Awake()
         {
-            importHandler = new ImportHandler(importButtonId, shaderMaterial, shader);
+            importHandler = new ImportHandler();
             dataHandler = new DataHandler(defaultData);
             saveHandler = new SaveHandler();
             exportHandler = new ExportHandler();
@@ -54,6 +58,9 @@ namespace FileManagement
             UserInterfaceHandler.instance.AddButtonRef(importButtonId);
             UserInterfaceHandler.instance.AddButtonListener(importButtonId, OnImportButtonPressed);
 
+            UserInterfaceHandler.instance.AddButtonRef(exportButtonId);
+            UserInterfaceHandler.instance.AddButtonListener(exportButtonId, OnExportButtonPressed);
+
             UserInterfaceHandler.instance.AddVisualElementRef(originalSpriteId);
             UserInterfaceHandler.instance.AddVisualElementRef(processedSpriteId);
             UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
@@ -65,6 +72,7 @@ namespace FileManagement
         private void OnDisable()
         {
             UserInterfaceHandler.instance.RemoveButtonListener(importButtonId, OnImportButtonPressed);
+            UserInterfaceHandler.instance.RemoveButtonListener(exportButtonId, OnExportButtonPressed);
         }
 
         private void OnImportButtonPressed()
@@ -94,6 +102,7 @@ namespace FileManagement
                 return;
             }
 
+            shaderMaterial.SetColorArray("oldColors", currentData.originalColors);
             UpdateUserInterface(currentData);
         }
 
@@ -104,9 +113,67 @@ namespace FileManagement
 
         private void OnExportButtonPressed()
         {
+            // format a default file name
+            string currentTime = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string defaultName = "ColorVariants" + "_" + currentTime;
 
+            // get url to export to
+            var url = StandaloneFileBrowser.SaveFilePanel("Open File", Application.persistentDataPath, defaultName, "");
+            if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
+            if (File.Exists(url)) { Debug.LogWarning($"File already exists at path! cancelling export"); return; }
+            Debug.Log($"Path selected: {url}");
+
+            // get the textures to export 
+            ExportOptions exportOptions = currentData.exportOptions;
+            Debug.Log($"Options; content: {exportOptions.content}, fileType: {exportOptions.fileType}");
+
+            Texture2D[] texturesToExport = null;
+            switch (exportOptions.content)
+            {
+                case ExportContent.SELECTED:
+                    texturesToExport = GetSelectedTexture();
+                    break;
+                case ExportContent.ALL: 
+                    texturesToExport = GetAllTextures();
+                    break;
+                case ExportContent.SPRITESHEET: 
+                    texturesToExport = GetSpriteSheetTexture();
+                    break;
+            }
+
+            exportHandler.Export(url, texturesToExport, exportOptions.fileType);
         }
 
+        private Texture2D[] GetSelectedTexture()
+        {
+            // set the new colors of the shader material to the colors saved in the variant
+            Color[] newColors = currentData.colorVariants[currentData.selectedIndex].newColors;
+            Material tempMaterial = shaderMaterial;
+            tempMaterial.SetColorArray("_newColors", newColors);
+            Texture2D texture = TextureUtils.GetShaderTexture(currentData.originalTexture, tempMaterial);
+            return new Texture2D[1] { texture };
+        }
+
+        private Texture2D[] GetAllTextures()
+        {
+            Texture2D[] textures = new Texture2D[currentData.colorVariants.Count];
+            for(int i = 0; i < currentData.colorVariants.Count; i++)
+            {
+                Color[] newColors = currentData.colorVariants[i].newColors;
+                Material tempMaterial = shaderMaterial;
+                tempMaterial.SetColorArray("_newColors", newColors);
+                textures[i] = TextureUtils.GetShaderTexture(currentData.originalTexture, tempMaterial);
+            }
+            return textures;
+        }
+
+        private Texture2D[] GetSpriteSheetTexture()
+        {
+            // get all textures for in the spritesheet
+            Texture2D[] textures = GetAllTextures();
+
+            return new Texture2D[1] { TextureUtils.CreateTextureSheet(textures) };
+        }
 
         private void UpdateUserInterface(DataHolder data)
         {

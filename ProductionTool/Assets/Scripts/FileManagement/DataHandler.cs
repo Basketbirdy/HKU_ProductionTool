@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace FileManagement
@@ -39,23 +40,9 @@ namespace FileManagement
             newProjectData.originalTexture = TextureUtils.LoadImage(url);
 
             // identify and store all unique colors
-            newProjectData.originalColors = GetUniqueColors(newProjectData.originalTexture);
+            newProjectData.originalColors = TextureUtils.GetUniqueColors(newProjectData.originalTexture);
 
             return newProjectData;
-        }
-
-        private HashSet<Color> GetUniqueColors(Texture2D texture)
-        {
-            Color[] pixels = texture.GetPixels();
-
-            HashSet<Color> colors = new HashSet<Color>(); // hashset because duplicates get ignored
-            
-            for(int i = 0; i < pixels.Length; i++)
-            {
-                colors.Add(pixels[i]);
-            }
-
-            return colors;
         }
     }
 }

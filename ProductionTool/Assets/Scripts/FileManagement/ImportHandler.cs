@@ -9,19 +9,21 @@ namespace FileManagement
 {
     public class ImportHandler
     {
-        private string importButtonId;
+        //private string importButtonId;
 
-        // temp
-        private Material shaderMaterial;
-        private Shader shader;
+        //// temp
+        //private Material shaderMaterial;
+        //private Shader shader;
 
-        public ImportHandler(string importButtonId, Material shaderMaterial, Shader shader)
-        {
-            this.importButtonId = importButtonId;
+        public ImportHandler() { }
 
-            this.shaderMaterial = shaderMaterial;
-            this.shader = shader;
-        }
+        //public ImportHandler(string importButtonId, Material shaderMaterial, Shader shader)
+        //{
+        //    this.importButtonId = importButtonId;
+
+        //    this.shaderMaterial = shaderMaterial;
+        //    this.shader = shader;
+        //}
 
         /// <summary>
         /// Method that interprets data at the provided path and returns it as a useable Data class
