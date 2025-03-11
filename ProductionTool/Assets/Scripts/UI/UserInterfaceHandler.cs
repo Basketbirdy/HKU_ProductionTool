@@ -78,6 +78,14 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!visualElements.ContainsKey(key)) { return; }
         visualElements[key].style.backgroundImage = new StyleBackground(sprite);
     }
+    public void InsertTemplateContainerIntoVisualElement(string key, VisualTreeAsset asset)
+    {
+        if(!visualElements.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
+        TemplateContainer template = asset.CloneTree();
+        visualElements[key].Add(template);
+        template.style.width = Length.Percent(25);
+        template.style.height = Length.Percent(15);
+    }
 
     public void AddButtonRef(string key)
     {

@@ -23,6 +23,12 @@ namespace FileManagement
         [Header("Project")]
         private DataHandler dataHandler;
         [SerializeField] private DataHolder currentData;
+        [Space]
+        [SerializeField] private string addVariantButtonid = "Button_AddVariant";
+        [SerializeField] private string removeVariantButtonid = "Button_RemoveVariant";
+        [SerializeField] private string variantButtonId = "Button_Variant";
+        [SerializeField] private string variantButtonAreaId = "VariantContainerMask";
+        [SerializeField] private VisualTreeAsset variantButtonTemplate;
 
         [Header("Shader")]
         [SerializeField] private Shader shader;
@@ -44,6 +50,7 @@ namespace FileManagement
         [SerializeField] private string processedSpriteId = "Sprite_Processed";
         [SerializeField] private string filenameLabelId = "Label_Filename";
 
+
         private void Awake()
         {
             importHandler = new ImportHandler();
@@ -63,6 +70,12 @@ namespace FileManagement
 
             UserInterfaceHandler.instance.AddButtonRef(exportButtonId);
             UserInterfaceHandler.instance.AddButtonListener(exportButtonId, OnExportButtonPressed);
+
+            UserInterfaceHandler.instance.AddButtonRef(addVariantButtonid);
+            UserInterfaceHandler.instance.AddButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
+            UserInterfaceHandler.instance.AddButtonRef(removeVariantButtonid);
+            UserInterfaceHandler.instance.AddButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
+            UserInterfaceHandler.instance.AddButtonRef(variantButtonId);
                 // dropdowns
             UserInterfaceHandler.instance.AddDropdownRef(exportContentDropdownId);
             UserInterfaceHandler.instance.AddDropdownListener(exportContentDropdownId, OnExportContentChange);
@@ -73,6 +86,8 @@ namespace FileManagement
                 // visual elements - images
             UserInterfaceHandler.instance.AddVisualElementRef(originalSpriteId);
             UserInterfaceHandler.instance.AddVisualElementRef(processedSpriteId);
+
+            UserInterfaceHandler.instance.AddVisualElementRef(variantButtonAreaId);
                 // labels - text
             UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
 
@@ -86,7 +101,11 @@ namespace FileManagement
                 // buttons
             UserInterfaceHandler.instance.RemoveButtonListener(importButtonId, OnImportButtonPressed);
             UserInterfaceHandler.instance.RemoveButtonListener(exportButtonId, OnExportButtonPressed);
-                // dropdowns
+
+            UserInterfaceHandler.instance.RemoveButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
+            UserInterfaceHandler.instance.RemoveButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
+
+            // dropdowns
             UserInterfaceHandler.instance.RemoveDropdownListener(exportContentDropdownId, OnExportContentChange);
             UserInterfaceHandler.instance.RemoveDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
         }
@@ -158,6 +177,18 @@ namespace FileManagement
             }
 
             exportHandler.Export(url, texturesToExport, exportOptions.fileType);
+        }
+
+        private void OnAddVariantButtonClicked()
+        {
+            Debug.Log("Add variant clicked!");
+            UserInterfaceHandler.instance.InsertTemplateContainerIntoVisualElement(variantButtonAreaId, variantButtonTemplate);
+
+        }
+        private void OnRemoveVariantButtonClicked()
+        {
+            Debug.Log("Remove variant clicked!");
+
         }
 
         private void OnExportContentChange(ChangeEvent<string> evt)

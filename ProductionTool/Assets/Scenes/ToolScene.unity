@@ -229,11 +229,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultData: {fileID: 11400000, guid: 69c1a5b898854234e9b789e0b00e295d, type: 2}
+  majorVersion: 0
+  minorVersion: 0
+  patchVersion: 0
   importButtonId: Button_Import
   currentData: {fileID: 0}
+  addVariantButtonid: Button_AddVariant
+  removeVariantButtonid: Button_RemoveVariant
+  variantButtonId: Button_Variant
+  variantButtonAreaId: VariantContainerMask
+  variantButtonTemplate: {fileID: 9197481963319205126, guid: f7a8b9014f718d4429417375b4f36a70, type: 3}
   shader: {fileID: 4800000, guid: 625491346d4930d49b8d0ecc2a0d4a72, type: 3}
   oldColor: {r: 0.078431375, g: 0.0627451, b: 0.07450981, a: 1}
   newColor: {r: 0.14117648, g: 0.15294118, b: 0.17254902, a: 1}
+  exportButtonId: Button_Export
+  exportContentDropdownId: Dropdown_ExportContent
+  exportFiletypeDropdownId: Dropdown_ExportFiletype
   originalSpriteId: Sprite_Original
   processedSpriteId: Sprite_Processed
   filenameLabelId: Label_Filename

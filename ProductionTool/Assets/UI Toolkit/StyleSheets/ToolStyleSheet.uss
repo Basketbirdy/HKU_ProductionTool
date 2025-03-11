@@ -51,7 +51,6 @@
 }
 
 .interactable {
-    flex-grow: 1;
 }
 
 .interactable:hover {
