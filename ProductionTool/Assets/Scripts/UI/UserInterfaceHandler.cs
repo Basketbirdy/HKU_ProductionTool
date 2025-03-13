@@ -13,6 +13,7 @@ public class UserInterfaceHandler : MonoBehaviour
     Dictionary<string, VisualElement> visualElements = new Dictionary<string, VisualElement>();
     Dictionary<string, Button> buttons = new Dictionary<string, Button>();
     Dictionary<string, DropdownField> dropdowns = new Dictionary<string, DropdownField>();
+    Dictionary<string, ScrollView> scrollViews = new Dictionary<string, ScrollView>();
 
     public static UserInterfaceHandler instance;
     private void Awake()
@@ -78,13 +79,42 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!visualElements.ContainsKey(key)) { return; }
         visualElements[key].style.backgroundImage = new StyleBackground(sprite);
     }
-    public void InsertTemplateContainerIntoVisualElement(string key, VisualTreeAsset asset)
+    //public void InsertTemplateContainerIntoVisualElement(string key, VisualTreeAsset asset)
+    //{
+    //    if(!visualElements.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
+    //    TemplateContainer template = asset.CloneTree();
+    //    visualElements[key].Add(template);
+    //    template.style.width = Length.Percent(25);
+    //    template.style.height = Length.Percent(15);
+    //}
+    public void SetVisualElementBackgroundColor(string key, Color color)
     {
-        if(!visualElements.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
+        if (!visualElements.ContainsKey(key)) { return; }
+        Debug.Log($"Changing background color to: {color}, alpha: {color.a}");
+        visualElements[key].style.backgroundColor = color * 255;
+    }
+    public void InsertButtonIntoVisualElement(string key, string buttonAssetKey, string desiredKey, VisualTreeAsset asset)
+    {
+        if (!visualElements.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
         TemplateContainer template = asset.CloneTree();
-        visualElements[key].Add(template);
-        template.style.width = Length.Percent(25);
-        template.style.height = Length.Percent(15);
+        Button temp = template.Q<Button>(buttonAssetKey);
+        temp.name = desiredKey;
+        visualElements[key].Add(temp);
+    }
+
+    public void AddScrollViewRef(string key)
+    {
+        if (scrollViews.ContainsKey(key)) { return; }
+        ScrollView value = root.Q<ScrollView>(key);
+        if (value != null) { scrollViews.Add(key, value); }
+    }
+    public void InsertElementIntoScrollView(string key, string elementAssetKey, string desiredKey, VisualTreeAsset asset)
+    {
+        if (!scrollViews.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
+        TemplateContainer template = asset.CloneTree();
+        VisualElement temp = template.Q<VisualElement>(elementAssetKey);
+        temp.name = desiredKey;
+        scrollViews[key].Add(temp);
     }
 
     public void AddButtonRef(string key)
@@ -102,6 +132,11 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if (!buttons.ContainsKey(key)) { return; }
         buttons[key].clicked -= action;
+    }
+    public void SetButtonLabel(string key, string msg)
+    {
+        if (!buttons.ContainsKey(key)) { return; }
+        buttons[key].text = msg;
     }
 
     public void AddDropdownRef(string key)

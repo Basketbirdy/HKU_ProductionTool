@@ -234,10 +234,16 @@ MonoBehaviour:
   patchVersion: 0
   importButtonId: Button_Import
   currentData: {fileID: 0}
+  variantColorEntryScrollViewId: ScrollView_ColorContainer
+  variantColorEntryContainerId: Element_VariantColorEntryContainer
+  variantColorEntryDefaultId: Element_VariantColorEntry
+  variantColorEntryOriginalColorId: Element_OriginalColor
+  variantColorEntryTemplate: {fileID: 9197481963319205126, guid: deee085c539e92d40bde6573f589d397, type: 3}
   addVariantButtonid: Button_AddVariant
   removeVariantButtonid: Button_RemoveVariant
   variantButtonId: Button_Variant
   variantButtonAreaId: VariantContainerMask
+  variantButtonDefaultId: Button_Variant
   variantButtonTemplate: {fileID: 9197481963319205126, guid: f7a8b9014f718d4429417375b4f36a70, type: 3}
   shader: {fileID: 4800000, guid: 625491346d4930d49b8d0ecc2a0d4a72, type: 3}
   oldColor: {r: 0.078431375, g: 0.0627451, b: 0.07450981, a: 1}

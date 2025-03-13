@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 namespace FileManagement
 {
@@ -23,11 +24,19 @@ namespace FileManagement
         [Header("Project")]
         private DataHandler dataHandler;
         [SerializeField] private DataHolder currentData;
+
+        [Header("ColorVariants")]
+        [SerializeField] private string variantColorEntryScrollViewId = "ScrollView_ColorContainer";
+        [SerializeField] private string variantColorEntryContainerId = "Element_VariantColorEntryContainer";
+        [SerializeField] private string variantColorEntryDefaultId = "Element_VariantColorEntry";
+        [SerializeField] private string variantColorEntryOriginalColorId = "Element_OriginalColor";
+        [SerializeField] private VisualTreeAsset variantColorEntryTemplate;
         [Space]
         [SerializeField] private string addVariantButtonid = "Button_AddVariant";
         [SerializeField] private string removeVariantButtonid = "Button_RemoveVariant";
         [SerializeField] private string variantButtonId = "Button_Variant";
         [SerializeField] private string variantButtonAreaId = "VariantContainerMask";
+        [SerializeField] private string variantButtonDefaultId = "Button_Variant";
         [SerializeField] private VisualTreeAsset variantButtonTemplate;
 
         [Header("Shader")]
@@ -91,6 +100,9 @@ namespace FileManagement
                 // labels - text
             UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
 
+            // scrollviews
+            UserInterfaceHandler.instance.AddScrollViewRef(variantColorEntryScrollViewId);
+
             shaderMaterial.SetColor("_OldColor", oldColor);
             shaderMaterial.SetColor("_NewColor", newColor);
         }
@@ -139,6 +151,7 @@ namespace FileManagement
 
             shaderMaterial.SetColorArray("oldColors", currentData.originalColors);
             UpdateUserInterface(currentData);
+            CreateVariantUI();
         }
 
         private void OnSaveButtonPressed()
@@ -181,9 +194,19 @@ namespace FileManagement
 
         private void OnAddVariantButtonClicked()
         {
-            Debug.Log("Add variant clicked!");
-            UserInterfaceHandler.instance.InsertTemplateContainerIntoVisualElement(variantButtonAreaId, variantButtonTemplate);
+            if(currentData == null) { return; }
 
+            // handle ui
+            Debug.Log("Add variant clicked!");
+            int variantIndex = currentData.colorVariants.Count;
+            string desiredKey = variantButtonDefaultId + variantIndex;
+            currentData.variantIndexStrings.Add(variantIndex, desiredKey);
+            UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
+            UserInterfaceHandler.instance.AddButtonRef(desiredKey);
+            UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
+
+            // create new variant
+            currentData.colorVariants.Add(new ColorVariant(desiredKey, currentData.originalColors));
         }
         private void OnRemoveVariantButtonClicked()
         {
@@ -261,6 +284,22 @@ namespace FileManagement
             Texture2D[] textures = GetAllTextures();
 
             return new Texture2D[1] { TextureUtils.CreateTextureSheet(textures) };
+        }
+
+        private void CreateVariantUI()
+        {
+            for(int i = 0; i < currentData.originalColors.Length; i++)
+            {
+                // handle ui
+                int colorIndex = i;
+                string desiredKey = variantColorEntryDefaultId + i;
+                currentData.variantColorEntryIndexStrings.Add(colorIndex, desiredKey);
+                UserInterfaceHandler.instance.InsertElementIntoScrollView(variantColorEntryScrollViewId, variantColorEntryDefaultId, desiredKey, variantColorEntryTemplate);
+                UserInterfaceHandler.instance.AddVisualElementRef(desiredKey);
+                UserInterfaceHandler.instance.AddVisualElementRef(variantColorEntryOriginalColorId);
+                Debug.Log($"Original color; index: {colorIndex}, Color: {currentData.originalColors[colorIndex]}");
+                UserInterfaceHandler.instance.SetVisualElementBackgroundColor(variantColorEntryOriginalColorId, currentData.originalColors[colorIndex]);
+            }
         }
 
         private void UpdateUserInterface(DataHolder data)

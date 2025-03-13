@@ -22,6 +22,8 @@ namespace FileManagement
 
         [Header("State data")]
         public int selectedIndex;
+        public Dictionary<int, string> variantIndexStrings = new Dictionary<int, string>();
+        public Dictionary<int, string> variantColorEntryIndexStrings = new Dictionary<int, string>();
 
         // options
         public ExportOptions exportOptions;
@@ -34,6 +36,9 @@ namespace FileManagement
 
             colorVariants = defaultData.colorVariants;
             exportOptions = defaultData.exportOptions;
+
+            variantIndexStrings = new Dictionary<int, string>();
+            variantColorEntryIndexStrings = new Dictionary<int, string>();
         }
 
         public void OnCreateDataHolder(DataHolder defaultData)
@@ -41,6 +46,12 @@ namespace FileManagement
             metaData = defaultData.metaData;
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
+
+            colorVariants = defaultData.colorVariants;
+            exportOptions = defaultData.exportOptions;
+
+            variantIndexStrings = new Dictionary<int, string>();
+            variantColorEntryIndexStrings = new Dictionary<int, string>();
         }
     }
 }
