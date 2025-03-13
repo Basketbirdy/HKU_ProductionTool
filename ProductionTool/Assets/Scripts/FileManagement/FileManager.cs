@@ -25,6 +25,8 @@ namespace FileManagement
         [Header("Project")]
         private DataHandler dataHandler;
         [SerializeField] private DataHolder currentData;
+        [Space]
+        [SerializeField] private ColorPicker colorPicker;
 
         [Header("ColorVariants")]
         [SerializeField] private string colorEntryScrollViewId = "ScrollView_ColorContainer";
@@ -74,6 +76,8 @@ namespace FileManagement
 
         private void Start()
         {
+            colorPicker.Initialize();
+
             // static ui
                 // buttons
             UserInterfaceHandler.instance.AddButtonRef(importButtonId);

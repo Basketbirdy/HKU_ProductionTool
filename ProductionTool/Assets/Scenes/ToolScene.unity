@@ -234,8 +234,18 @@ MonoBehaviour:
   patchVersion: 0
   importButtonId: Button_Import
   currentData: {fileID: 0}
+  colorPicker:
+    selectedColor:
+      serializedVersion: 2
+      rgba: 4294967295
+    redSliderId: SliderInt_ColorPicker_Red
+    greenSliderId: SliderInt_ColorPicker_Green
+    blueSliderId: SliderInt_ColorPicker_Blue
+    redIntegerFieldId: IntegerField_ColorPicker_Red
+    greenIntegerFieldId: IntegerField_ColorPicker_Green
+    blueIntegerFieldId: IntegerField_ColorPicker_Blue
+    hexTextFieldId: TextField_ColorPicker_Hex
   colorEntryScrollViewId: ScrollView_ColorContainer
-  colorEntryContainerId: Element_VariantColorEntryContainer
   colorEntryDefaultId: Element_VariantColorEntry
   colorEntryOriginalColorDefaultId: Element_OriginalColor
   colorEntryIndexLabelDefaultId: Label_VariantIndex

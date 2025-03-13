@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class UserInterfaceHandler : MonoBehaviour
@@ -10,6 +11,7 @@ public class UserInterfaceHandler : MonoBehaviour
 
     Dictionary<string, Label> labels = new Dictionary<string, Label>();
     Dictionary<string, TextField> textFields = new Dictionary<string, TextField>();
+    Dictionary<string, IntegerField> integerFields = new Dictionary<string, IntegerField>();
     Dictionary<string, VisualElement> visualElements = new Dictionary<string, VisualElement>();
 
     Dictionary<string, Button> buttons = new Dictionary<string, Button>();
@@ -17,6 +19,7 @@ public class UserInterfaceHandler : MonoBehaviour
 
     Dictionary<string, DropdownField> dropdowns = new Dictionary<string, DropdownField>();
     Dictionary<string, ScrollView> scrollViews = new Dictionary<string, ScrollView>();
+    Dictionary<string, SliderInt> sliderInts = new Dictionary<string, SliderInt>();
 
     public static UserInterfaceHandler instance;
     private void Awake()
@@ -42,28 +45,6 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if (!labels.ContainsKey(key)) { return; }
         labels[key].text = text;
-    }
-
-    public void AddTextFieldRef(string key)
-    {
-        if (textFields.ContainsKey(key)) { return; }
-        TextField value = root.Q<TextField>(key);
-        if (value != null) { textFields.Add(key, value); }
-    }
-    public void RemoveTextFieldRef(string key)
-    {
-        if (!textFields.ContainsKey(key)) { return; }
-        textFields.Remove(key);
-    }
-    public string GetTextFieldText(string key)
-    {
-        if (!textFields.ContainsKey(key)) { return null; }
-        return textFields[key].text;
-    }
-    public void SetTextFieldLabel(string key, string text)
-    {
-        if (!textFields.ContainsKey(key)) { return; }
-        textFields[key].label = text;
     }
 
     public void AddVisualElementRef(string key)
@@ -97,14 +78,6 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!visualElements.ContainsKey(key)) { return; }
         visualElements[key].style.backgroundImage = new StyleBackground(sprite);
     }
-    //public void InsertTemplateContainerIntoVisualElement(string key, VisualTreeAsset asset)
-    //{
-    //    if(!visualElements.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
-    //    TemplateContainer template = asset.CloneTree();
-    //    visualElements[key].Add(template);
-    //    template.style.width = Length.Percent(25);
-    //    template.style.height = Length.Percent(15);
-    //}
     public void SetVisualElementBackgroundColor(string key, Color color)
     {
         if (!visualElements.ContainsKey(key)) { return; }
@@ -117,6 +90,11 @@ public class UserInterfaceHandler : MonoBehaviour
         Button temp = template.Q<Button>(buttonAssetKey);
         temp.name = desiredKey;
         visualElements[key].Add(temp);
+    }
+    public void ClearVisualElement(string key)
+    {
+        if (!visualElements.ContainsKey(key)) { return; }
+        visualElements[key].Clear();
     }
 
     public void AddScrollViewRef(string key)
@@ -210,15 +188,125 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!dropdowns.ContainsKey(key)) { return; }
         dropdowns[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
     }
-
-    public void ClearVisualElement(string key)
-    {
-        if(!visualElements.ContainsKey(key)) { return; }
-        visualElements[key].Clear();
-    }
     public void ClearScrollView(string key)
     {
         if (!scrollViews.ContainsKey(key)) { return; }
         scrollViews[key].Clear();
+    }
+
+    public void AddSliderIntRef(string key)
+    {
+        if (sliderInts.ContainsKey(key)) { return; }
+        SliderInt value = root.Q<SliderInt>(key);
+        if (value != null) { sliderInts.Add(key, value); }
+    }
+    public void RemoveSliderIntRef(string key)
+    {
+        if (!sliderInts.ContainsKey(key)) { return; }
+        sliderInts.Remove(key);
+    }
+    public int GetSliderIntValue(string key)
+    {
+        if (!sliderInts.ContainsKey(key)) { return -1; }
+        return sliderInts[key].value;
+    }
+    public void SetSliderIntValue(string key, int value)
+    {
+        if (!sliderInts.ContainsKey(key)) { return; }
+        sliderInts[key].value = value;
+    }
+    public void SetSliderIntValueWithoutNotify(string key, int value)
+    {
+        if (!sliderInts.ContainsKey(key)) { return; }
+        sliderInts[key].SetValueWithoutNotify(value);
+    }
+    public void AddSliderIntListener(string key, Action<ChangeEvent<int>> action)
+    {
+        if (!sliderInts.ContainsKey(key)) { return; }
+        sliderInts[key].RegisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+    public void RemoveSliderIntListener(string key, Action<ChangeEvent<int>> action)
+    {
+        if (!sliderInts.ContainsKey(key)) { return; }
+        sliderInts[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+
+    public void AddTextFieldRef(string key)
+    {
+        if (textFields.ContainsKey(key)) { return; }
+        TextField value = root.Q<TextField>(key);
+        if (value != null) { textFields.Add(key, value); }
+    }
+    public void RemoveTextFieldRef(string key)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields.Remove(key);
+    }
+    public string GetTextFieldText(string key)
+    {
+        if (!textFields.ContainsKey(key)) { return null; }
+        return textFields[key].text;
+    }
+    public void SetTextFieldLabel(string key, string text)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields[key].label = text;
+    }
+    public void SetTextFieldValue(string key, string value)
+    {
+        if (!textFields.ContainsKey(key)) { return; };
+        textFields[key].value = value;
+    }
+    public void SetTextFieldValueWithoutNotify(string key, string value)
+    {
+        if (!textFields.ContainsKey(key)) { return; };
+        textFields[key].SetValueWithoutNotify(value);
+    }
+    public void AddTextFieldListener(string key, Action<ChangeEvent<string>> action)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields[key].RegisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+    public void RemoveTextFieldListener(string key, Action<ChangeEvent<string>> action)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+
+    public void AddIntegerFieldRef(string key)
+    {
+        if (integerFields.ContainsKey(key)) { return; }
+        IntegerField value = root.Q<IntegerField>(key);
+        if (value != null) { integerFields.Add(key, value); }
+    }
+    public void RemoveIntegerFieldRef(string key)
+    {
+        if (!integerFields.ContainsKey(key)) { return; }
+        integerFields.Remove(key);
+    }
+    public int GetIntegerFieldValue(string key)
+    {
+        if (!integerFields.ContainsKey(key)) { return -1; }
+        return integerFields[key].value;
+    }
+    public void SetIntegerFieldLabel(string key, string text)
+    {
+        if (!integerFields.ContainsKey(key)) { return; }
+        integerFields[key].label = text;
+    }
+    public void SetIntegerFieldValue(string key, int value)
+    {
+        if (!integerFields.ContainsKey(key)) { return; };
+        integerFields[key].value = value;
+    }
+    public void AddIntegerFieldListener(string key, Action<ChangeEvent<int>> action)
+    {
+        if (!integerFields.ContainsKey(key)) { return; }
+        integerFields[key].RegisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+    public void RemoveIntegerFieldListener(string key, Action<ChangeEvent<int>> action)
+    {
+        if (!integerFields.ContainsKey(key)) { return; }
+        integerFields[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
     }
 }
