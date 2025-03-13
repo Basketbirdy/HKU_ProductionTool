@@ -11,7 +11,10 @@ public class UserInterfaceHandler : MonoBehaviour
     Dictionary<string, Label> labels = new Dictionary<string, Label>();
     Dictionary<string, TextField> textFields = new Dictionary<string, TextField>();
     Dictionary<string, VisualElement> visualElements = new Dictionary<string, VisualElement>();
+
     Dictionary<string, Button> buttons = new Dictionary<string, Button>();
+    Dictionary<string, Action> buttonLambdas = new Dictionary<string, Action>();
+
     Dictionary<string, DropdownField> dropdowns = new Dictionary<string, DropdownField>();
     Dictionary<string, ScrollView> scrollViews = new Dictionary<string, ScrollView>();
 
@@ -30,6 +33,11 @@ public class UserInterfaceHandler : MonoBehaviour
         Label value = root.Q<Label>(key);
         if (value != null) { labels.Add(key, value); }
     }
+    public void RemoveLabelRef(string key)
+    {
+        if (!labels.ContainsKey(key)) { return; }
+        labels.Remove(key);
+    }
     public void SetLabel(string key, string text)
     {
         if (!labels.ContainsKey(key)) { return; }
@@ -41,6 +49,11 @@ public class UserInterfaceHandler : MonoBehaviour
         if (textFields.ContainsKey(key)) { return; }
         TextField value = root.Q<TextField>(key);
         if (value != null) { textFields.Add(key, value); }
+    }
+    public void RemoveTextFieldRef(string key)
+    {
+        if (!textFields.ContainsKey(key)) { return; }
+        textFields.Remove(key);
     }
     public string GetTextFieldText(string key)
     {
@@ -58,6 +71,11 @@ public class UserInterfaceHandler : MonoBehaviour
         if (visualElements.ContainsKey(key)) { return; }
         VisualElement value = root.Q<VisualElement>(key);
         if (value != null) { visualElements.Add(key, value); }
+    }
+    public void RemoveVisualElementRef(string key)
+    {
+        if (!visualElements.ContainsKey(key)) { return; }
+        visualElements.Remove(key);
     }
     public void ShowVisualElement(string key)
     {
@@ -90,8 +108,7 @@ public class UserInterfaceHandler : MonoBehaviour
     public void SetVisualElementBackgroundColor(string key, Color color)
     {
         if (!visualElements.ContainsKey(key)) { return; }
-        Debug.Log($"Changing background color to: {color}, alpha: {color.a}");
-        visualElements[key].style.backgroundColor = color * 255;
+        visualElements[key].style.backgroundColor = new StyleColor(color);
     }
     public void InsertButtonIntoVisualElement(string key, string buttonAssetKey, string desiredKey, VisualTreeAsset asset)
     {
@@ -108,12 +125,16 @@ public class UserInterfaceHandler : MonoBehaviour
         ScrollView value = root.Q<ScrollView>(key);
         if (value != null) { scrollViews.Add(key, value); }
     }
-    public void InsertElementIntoScrollView(string key, string elementAssetKey, string desiredKey, VisualTreeAsset asset)
+    public void RemoveScrollViewRef(string key)
     {
-        if (!scrollViews.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
-        TemplateContainer template = asset.CloneTree();
+        if (!scrollViews.ContainsKey(key)) { return; }
+        scrollViews.Remove(key);
+    }
+    public void InsertElementIntoScrollView(string key, string elementAssetKey, string desiredKey, TemplateContainer template)
+    {
         VisualElement temp = template.Q<VisualElement>(elementAssetKey);
         temp.name = desiredKey;
+        if (!scrollViews.ContainsKey(key)) { Debug.LogError("Visual element insertion target does not have a reference! throwing error"); return; }
         scrollViews[key].Add(temp);
     }
 
@@ -123,20 +144,44 @@ public class UserInterfaceHandler : MonoBehaviour
         Button value = root.Q<Button>(key);
         if (value != null) { buttons.Add(key, value); }
     }
+    public void RemoveButtonRef(string key)
+    {
+        if (!buttons.ContainsKey(key)) { return; }
+        buttons.Remove(key);
+    }
     public void AddButtonListener(string key, System.Action action)
     {
         if (!buttons.ContainsKey(key)) { return; }
         buttons[key].clicked += action;
+    }
+    public void AddButtonListener<T>(string key, System.Action<T> action, T parameter)
+    {
+        if (!buttons.ContainsKey(key)) { return; }
+        if (buttonLambdas.ContainsKey(key)) { buttonLambdas.Remove(key); }
+        buttonLambdas.Add(key, () => action(parameter));
+        buttons[key].clicked += buttonLambdas[key];
     }
     public void RemoveButtonListener(string key, System.Action action)
     {
         if (!buttons.ContainsKey(key)) { return; }
         buttons[key].clicked -= action;
     }
+    public void RemoveButtonListener<T>(string key)
+    {
+        if (!buttons.ContainsKey(key)) { return; }
+        if (!buttonLambdas.ContainsKey(key)) { return; }
+        buttons[key].clicked -= buttonLambdas[key];
+        buttonLambdas.Remove(key);
+    }
     public void SetButtonLabel(string key, string msg)
     {
         if (!buttons.ContainsKey(key)) { return; }
         buttons[key].text = msg;
+    }
+    public void SetButtonBackgroundColor(string key, Color color)
+    {
+        if (!buttons.ContainsKey(key)) { return; }
+        buttons[key].style.backgroundColor = new StyleColor(color);
     }
 
     public void AddDropdownRef(string key)
@@ -144,6 +189,11 @@ public class UserInterfaceHandler : MonoBehaviour
         if(dropdowns.ContainsKey(key)) { return; }
         DropdownField value = root.Q<DropdownField>(key);
         if(value != null) { dropdowns.Add(key, value); }
+    }
+    public void RemoveDropdownRef(string key)
+    {
+        if (!dropdowns.ContainsKey(key)) { return; }
+        dropdowns.Remove(key);
     }
     public int GetDropdownValue(string key)
     {
@@ -159,5 +209,16 @@ public class UserInterfaceHandler : MonoBehaviour
     {
         if (!dropdowns.ContainsKey(key)) { return; }
         dropdowns[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
+    }
+
+    public void ClearVisualElement(string key)
+    {
+        if(!visualElements.ContainsKey(key)) { return; }
+        visualElements[key].Clear();
+    }
+    public void ClearScrollView(string key)
+    {
+        if (!scrollViews.ContainsKey(key)) { return; }
+        scrollViews[key].Clear();
     }
 }

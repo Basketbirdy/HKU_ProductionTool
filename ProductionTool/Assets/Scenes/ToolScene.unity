@@ -234,11 +234,13 @@ MonoBehaviour:
   patchVersion: 0
   importButtonId: Button_Import
   currentData: {fileID: 0}
-  variantColorEntryScrollViewId: ScrollView_ColorContainer
-  variantColorEntryContainerId: Element_VariantColorEntryContainer
-  variantColorEntryDefaultId: Element_VariantColorEntry
-  variantColorEntryOriginalColorId: Element_OriginalColor
-  variantColorEntryTemplate: {fileID: 9197481963319205126, guid: deee085c539e92d40bde6573f589d397, type: 3}
+  colorEntryScrollViewId: ScrollView_ColorContainer
+  colorEntryContainerId: Element_VariantColorEntryContainer
+  colorEntryDefaultId: Element_VariantColorEntry
+  colorEntryOriginalColorDefaultId: Element_OriginalColor
+  colorEntryIndexLabelDefaultId: Label_VariantIndex
+  colorEntryNewColorButtonDefaultId: Button_NewColor
+  colorEntryTemplate: {fileID: 9197481963319205126, guid: deee085c539e92d40bde6573f589d397, type: 3}
   addVariantButtonid: Button_AddVariant
   removeVariantButtonid: Button_RemoveVariant
   variantButtonId: Button_Variant

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
+using UnityEditor.VersionControl;
 
 namespace FileManagement
 {
@@ -26,11 +27,12 @@ namespace FileManagement
         [SerializeField] private DataHolder currentData;
 
         [Header("ColorVariants")]
-        [SerializeField] private string variantColorEntryScrollViewId = "ScrollView_ColorContainer";
-        [SerializeField] private string variantColorEntryContainerId = "Element_VariantColorEntryContainer";
-        [SerializeField] private string variantColorEntryDefaultId = "Element_VariantColorEntry";
-        [SerializeField] private string variantColorEntryOriginalColorId = "Element_OriginalColor";
-        [SerializeField] private VisualTreeAsset variantColorEntryTemplate;
+        [SerializeField] private string colorEntryScrollViewId = "ScrollView_ColorContainer";
+        [SerializeField] private string colorEntryDefaultId = "Element_VariantColorEntry";
+        [SerializeField] private string colorEntryOriginalColorDefaultId = "Element_OriginalColor";
+        [SerializeField] private string colorEntryIndexLabelDefaultId = "Label_VariantIndex";
+        [SerializeField] private string colorEntryNewColorButtonDefaultId = "Button_NewColor";
+        [SerializeField] private VisualTreeAsset colorEntryTemplate;
         [Space]
         [SerializeField] private string addVariantButtonid = "Button_AddVariant";
         [SerializeField] private string removeVariantButtonid = "Button_RemoveVariant";
@@ -101,7 +103,7 @@ namespace FileManagement
             UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
 
             // scrollviews
-            UserInterfaceHandler.instance.AddScrollViewRef(variantColorEntryScrollViewId);
+            UserInterfaceHandler.instance.AddScrollViewRef(colorEntryScrollViewId);
 
             shaderMaterial.SetColor("_OldColor", oldColor);
             shaderMaterial.SetColor("_NewColor", newColor);
@@ -120,10 +122,18 @@ namespace FileManagement
             // dropdowns
             UserInterfaceHandler.instance.RemoveDropdownListener(exportContentDropdownId, OnExportContentChange);
             UserInterfaceHandler.instance.RemoveDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
+
+            // dynamic ui
+            for(int i = 0; i < currentData.originalColors.Length; i++)
+            {
+                UserInterfaceHandler.instance.RemoveButtonListener<int>(colorEntryNewColorButtonDefaultId + i);
+            }
         }
 
         private void OnImportButtonPressed()
         {
+            if(currentData != null) { /* ask for confirmation */ }
+
             // select file
             var extensions = new[] {
                 new ExtensionFilter("Image Files", "png", "jpg", "jpeg" ),
@@ -132,6 +142,8 @@ namespace FileManagement
             var url = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
             if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
             Debug.Log($"Path selected: {url[0]}; File extension: {Path.GetExtension(url[0])}");
+
+            ClearDynamicUserInterface();
 
             // check file extension
             string extension = Path.GetExtension(url[0]);
@@ -290,16 +302,47 @@ namespace FileManagement
         {
             for(int i = 0; i < currentData.originalColors.Length; i++)
             {
-                // handle ui
+                if(i == 0) { continue; }
+
+                // Create ui from template
                 int colorIndex = i;
-                string desiredKey = variantColorEntryDefaultId + i;
+                string desiredKey = colorEntryDefaultId + i;
                 currentData.variantColorEntryIndexStrings.Add(colorIndex, desiredKey);
-                UserInterfaceHandler.instance.InsertElementIntoScrollView(variantColorEntryScrollViewId, variantColorEntryDefaultId, desiredKey, variantColorEntryTemplate);
+
+                TemplateContainer template = colorEntryTemplate.CloneTree();
+                
+                // get and give every element that needs to be accessed later an identifiable name
+                VisualElement originalColorElement = template.Q<VisualElement>(colorEntryOriginalColorDefaultId);
+                originalColorElement.name = colorEntryOriginalColorDefaultId + i;
+
+                Label colorIndexLabel = template.Q<Label>(colorEntryIndexLabelDefaultId);
+                colorIndexLabel.name = colorEntryIndexLabelDefaultId + i;
+
+                Button newColorButton = template.Q<Button>(colorEntryNewColorButtonDefaultId);
+                newColorButton.name = colorEntryNewColorButtonDefaultId + i;
+
+                UserInterfaceHandler.instance.InsertElementIntoScrollView(colorEntryScrollViewId, colorEntryDefaultId, desiredKey, template);
                 UserInterfaceHandler.instance.AddVisualElementRef(desiredKey);
-                UserInterfaceHandler.instance.AddVisualElementRef(variantColorEntryOriginalColorId);
-                Debug.Log($"Original color; index: {colorIndex}, Color: {currentData.originalColors[colorIndex]}");
-                UserInterfaceHandler.instance.SetVisualElementBackgroundColor(variantColorEntryOriginalColorId, currentData.originalColors[colorIndex]);
+
+                // handle ui
+                UserInterfaceHandler.instance.AddVisualElementRef(colorEntryOriginalColorDefaultId + i);
+                UserInterfaceHandler.instance.SetVisualElementBackgroundColor(colorEntryOriginalColorDefaultId + i, currentData.originalColors[i]);
+                UserInterfaceHandler.instance.RemoveVisualElementRef(colorEntryOriginalColorDefaultId + i); // get rid of the reference if not needed anymore
+
+                UserInterfaceHandler.instance.AddLabelRef(colorEntryIndexLabelDefaultId + i);
+                UserInterfaceHandler.instance.SetLabel(colorEntryIndexLabelDefaultId + i, i.ToString());
+                UserInterfaceHandler.instance.RemoveLabelRef(colorEntryIndexLabelDefaultId + i); // get rid of the reference if not needed anymore
+
+                UserInterfaceHandler.instance.AddButtonRef(colorEntryNewColorButtonDefaultId + i);
+                UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + i, currentData.originalColors[i]);
+                UserInterfaceHandler.instance.AddButtonListener<int>(colorEntryNewColorButtonDefaultId + i, OnChangeColorButtonClicked, i);
+                //Debug.Log($"Original color; index: {colorIndex}, Color: {currentData.originalColors[colorIndex]}");
             }
+        }
+
+        private void OnChangeColorButtonClicked(int index)
+        {
+            Debug.Log($"Clicked color index button: {index}");
         }
 
         private void UpdateUserInterface(DataHolder data)
@@ -311,6 +354,30 @@ namespace FileManagement
             UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
 
             UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
+        }
+
+        private void ClearDynamicUserInterface()
+        {
+            if(currentData == null) { return; }
+
+            // clean up dynamic ui listeners (and other garbage)
+            for (int i = 0; i < currentData.originalColors.Length; i++)
+            {
+                UserInterfaceHandler.instance.RemoveButtonListener<int>(colorEntryNewColorButtonDefaultId + i.ToString());
+                UserInterfaceHandler.instance.RemoveButtonRef(colorEntryNewColorButtonDefaultId + i.ToString());
+                UserInterfaceHandler.instance.RemoveVisualElementRef(colorEntryDefaultId + i.ToString());
+            }
+
+            // remove all color variants
+            for(int i = 0; i < currentData.colorVariants.Count; i++)
+            {
+                // remove any references
+                UserInterfaceHandler.instance.RemoveButtonRef(variantButtonDefaultId + i.ToString());
+
+            }
+
+            UserInterfaceHandler.instance.ClearVisualElement(variantButtonAreaId);
+            UserInterfaceHandler.instance.ClearScrollView(colorEntryScrollViewId);
         }
 
         // editor button methods
