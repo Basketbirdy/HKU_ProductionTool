@@ -4,8 +4,6 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 
 namespace FileManagement
 {
@@ -24,8 +22,8 @@ namespace FileManagement
 
         [Header("Project")]
         private DataHandler dataHandler;
-        [SerializeField] private DataHolder currentData;
-        [Space]
+        private DataHolder currentData;
+
         [SerializeField] private ColorPicker colorPicker;
 
         [Header("ColorVariants")]
@@ -242,7 +240,7 @@ namespace FileManagement
         private void OnRemoveVariantButtonClicked()
         {
             Debug.Log("Remove variant clicked!");
-
+ 
         }
 
         private void EvaluateColorVariants()

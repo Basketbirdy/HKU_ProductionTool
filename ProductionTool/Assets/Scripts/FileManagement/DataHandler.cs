@@ -9,6 +9,8 @@ namespace FileManagement
     {
         private DataHolder defaultData;
 
+        private DataHolder activeData;
+
         public DataHandler(DataHolder defaultData) 
         {
             this.defaultData = defaultData;
@@ -23,7 +25,7 @@ namespace FileManagement
         public DataHolder CreateFreshProject(string url, string version)
         {
             // TODO - create instance of SavaData class filled with default values and provided image
-            Debug.LogWarning($"TODO - Implement creating fresh project data");
+            //Debug.LogWarning($"TODO - Implement creating fresh project data");
 
             // create metadata
             DataHeader metaData = (DataHeader)ScriptableObject.CreateInstance("DataHeader");

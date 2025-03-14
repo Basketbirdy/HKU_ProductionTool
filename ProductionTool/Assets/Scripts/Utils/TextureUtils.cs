@@ -139,7 +139,7 @@ public static class TextureUtils
         return sheetTexture;
     }
 
-    public static Texture2D CreateColorTexture(params Color[][] colors)
+    public static Texture2D CreateColorTextureND(params Color[][] colors)
     {
         if (colors.Length == 0) return null;
 
@@ -156,6 +156,26 @@ public static class TextureUtils
                 else { texture.SetPixel(j, i, colors[i][j]); }
             }
         }
+        texture.Apply();
+        texture.filterMode = FilterMode.Point;
+
+        return texture;
+    }
+    public static Texture2D CreateColorTexture1D(Color[] colors)
+    {
+        if (colors.Length == 0) return null;
+
+        int width = 256;
+        int height = colors.Length;
+
+        Texture2D texture = new Texture2D(width, 1);
+
+        for (int j = 0; j < width; j++)
+        {
+            if (j >= colors.Length) { texture.SetPixel(j, height, new Color(0, 0, 0, 0)); }
+            else { texture.SetPixel(j, height, colors[j]); }
+        }
+
         texture.Apply();
         texture.filterMode = FilterMode.Point;
 
