@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine.UIElements;
 
 public static class TextureUtils
 {
@@ -136,6 +137,29 @@ public static class TextureUtils
         sheetTexture.Apply();
 
         return sheetTexture;
+    }
+
+    public static Texture2D CreateColorTexture(params Color[][] colors)
+    {
+        if (colors.Length == 0) return null;
+
+        int width = 256;
+        int height = colors.Length;
+
+        Texture2D texture = new Texture2D(width, height);
+
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if(j >= colors[i].Length) { texture.SetPixel(j, i, new Color(0, 0, 0, 0)); }
+                else { texture.SetPixel(j, i, colors[i][j]); }
+            }
+        }
+        texture.Apply();
+        texture.filterMode = FilterMode.Point;
+
+        return texture;
     }
 
     public static Color[] GetUniqueColors(Texture2D texture)
