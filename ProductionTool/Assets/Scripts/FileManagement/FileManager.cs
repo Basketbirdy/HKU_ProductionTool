@@ -175,11 +175,14 @@ namespace FileManagement
                 return;
             }
 
-            shaderMaterial.SetColorArray("oldColors", currentData.originalColors);
             UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
             UserInterfaceHandler.instance.SetLabel(filenameLabelId, currentData.fileName);
+
+            UpdateShaderInfo();
             UpdateShaderImage();
-            CreateColorEntries();
+
+            EvaluateColorVariants();
+            EvaluateColorEntries();
         }
 
         private void OnSaveButtonPressed()
@@ -240,6 +243,19 @@ namespace FileManagement
         {
             Debug.Log("Remove variant clicked!");
 
+        }
+
+        private void EvaluateColorVariants()
+        {
+            for(int i = 0; i < currentData.colorVariants.Count; i++)
+            {
+                int variantIndex = currentData.colorVariants.Count - 1;
+                string desiredKey = variantButtonDefaultId + variantIndex;
+                currentData.variantIndexStrings.Add(variantIndex, desiredKey);
+                UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
+                UserInterfaceHandler.instance.AddButtonRef(desiredKey);
+                UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
+            }
         }
 
         private void OnExportContentChange(ChangeEvent<string> evt)
@@ -314,7 +330,7 @@ namespace FileManagement
             return new Texture2D[1] { TextureUtils.CreateTextureSheet(textures) };
         }
 
-        private void CreateColorEntries()
+        private void EvaluateColorEntries()
         {
             for(int i = 0; i < currentData.originalColors.Length; i++)
             {
@@ -396,13 +412,13 @@ namespace FileManagement
         {
             if(data != null) 
             {
-                shaderMaterial.SetColorArray("_OldColor", data.originalColors);
-                shaderMaterial.SetColorArray("_NewColor", data.colorVariants[data.selectedIndex].newColors);
+                shaderMaterial.SetColorArray("_OldColors", data.originalColors);
+                shaderMaterial.SetColorArray("_NewColors", data.colorVariants[data.selectedIndex].newColors);
                 return;
             }
 
-            shaderMaterial.SetColorArray("_OldColor", currentData.originalColors);
-            shaderMaterial.SetColorArray("_NewColor", currentData.colorVariants[currentData.selectedIndex].newColors);
+            shaderMaterial.SetColorArray("_OldColors", currentData.originalColors);
+            shaderMaterial.SetColorArray("_NewColors", currentData.colorVariants[currentData.selectedIndex].newColors);
         }
         private void UpdateShaderImage()
         {
