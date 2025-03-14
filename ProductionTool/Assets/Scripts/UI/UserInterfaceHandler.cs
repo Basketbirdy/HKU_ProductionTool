@@ -78,9 +78,10 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!visualElements.ContainsKey(key)) { return; }
         visualElements[key].style.backgroundImage = new StyleBackground(sprite);
     }
-    public void SetVisualElementBackgroundColor(string key, Color color)
+    public void SetVisualElementBackgroundColor(string key, Color32 color)
     {
         if (!visualElements.ContainsKey(key)) { return; }
+        Debug.Log($"Setting background color to: {color}");
         visualElements[key].style.backgroundColor = new StyleColor(color);
     }
     public void InsertButtonIntoVisualElement(string key, string buttonAssetKey, string desiredKey, VisualTreeAsset asset)
@@ -217,8 +218,9 @@ public class UserInterfaceHandler : MonoBehaviour
     }
     public void SetSliderIntValueWithoutNotify(string key, int value)
     {
-        if (!sliderInts.ContainsKey(key)) { return; }
+        if (!sliderInts.ContainsKey(key)) { Debug.Log($"No SliderInt found at {key}"); return; }
         sliderInts[key].SetValueWithoutNotify(value);
+        Debug.Log($"New '{key}' value is {sliderInts[key].value}");
     }
     public void AddSliderIntListener(string key, Action<ChangeEvent<int>> action)
     {
@@ -299,14 +301,20 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!integerFields.ContainsKey(key)) { return; };
         integerFields[key].value = value;
     }
+    public void SetIntegerFieldValueWithoutNotify(string key, int value)
+    {
+        if (!integerFields.ContainsKey(key)) { Debug.Log($"No integerfield found at {key}"); return; };
+        integerFields[key].SetValueWithoutNotify(value);
+        Debug.Log($"New '{key}' value is {integerFields[key].value}");
+    }
     public void AddIntegerFieldListener(string key, Action<ChangeEvent<int>> action)
     {
         if (!integerFields.ContainsKey(key)) { return; }
-        integerFields[key].RegisterValueChangedCallback(evt => action.Invoke(evt));
+        integerFields[key].RegisterCallback<ChangeEvent<int>>(evt => action.Invoke(evt));
     }
     public void RemoveIntegerFieldListener(string key, Action<ChangeEvent<int>> action)
     {
         if (!integerFields.ContainsKey(key)) { return; }
-        integerFields[key].UnregisterValueChangedCallback(evt => action.Invoke(evt));
+        integerFields[key].UnregisterCallback<ChangeEvent<int>>(evt => action.Invoke(evt));
     }
 }

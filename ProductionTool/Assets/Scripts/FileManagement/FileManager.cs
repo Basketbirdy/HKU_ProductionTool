@@ -63,6 +63,9 @@ namespace FileManagement
         [SerializeField] private string processedSpriteId = "Sprite_Processed";
         [SerializeField] private string filenameLabelId = "Label_Filename";
 
+        [Header("Events")]
+        public static Action onColorDataChange;
+
 
         private void Awake()
         {
@@ -109,8 +112,12 @@ namespace FileManagement
             // scrollviews
             UserInterfaceHandler.instance.AddScrollViewRef(colorEntryScrollViewId);
 
+            // shader
             shaderMaterial.SetColor("_OldColor", oldColor);
             shaderMaterial.SetColor("_NewColor", newColor);
+
+            // events
+            onColorDataChange += UpdateShaderImage;
         }
 
         private void OnDisable()
@@ -132,6 +139,9 @@ namespace FileManagement
             {
                 UserInterfaceHandler.instance.RemoveButtonListener<int>(colorEntryNewColorButtonDefaultId + i);
             }
+
+            // events
+            onColorDataChange -= UpdateShaderImage;
         }
 
         private void OnImportButtonPressed()
@@ -166,8 +176,10 @@ namespace FileManagement
             }
 
             shaderMaterial.SetColorArray("oldColors", currentData.originalColors);
-            UpdateUserInterface(currentData);
-            CreateVariantUI();
+            UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
+            UserInterfaceHandler.instance.SetLabel(filenameLabelId, currentData.fileName);
+            UpdateShaderImage();
+            CreateColorEntries();
         }
 
         private void OnSaveButtonPressed()
@@ -302,7 +314,7 @@ namespace FileManagement
             return new Texture2D[1] { TextureUtils.CreateTextureSheet(textures) };
         }
 
-        private void CreateVariantUI()
+        private void CreateColorEntries()
         {
             for(int i = 0; i < currentData.originalColors.Length; i++)
             {
@@ -347,6 +359,26 @@ namespace FileManagement
         private void OnChangeColorButtonClicked(int index)
         {
             Debug.Log($"Clicked color index button: {index}");
+            if (colorPicker.GetState()) { colorPicker.OnCancelButtonClicked(); }
+
+            colorPicker.Open(currentData.colorVariants[currentData.selectedIndex].newColors[index], index);
+            colorPicker.AddColorListener(OnColorPickerClosed);
+        }
+
+        private void OnColorPickerClosed(Color32 color, int index)
+        {
+            colorPicker.RemoveColorListener(OnColorPickerClosed);
+            if(color == new Color(0, 0, 0, 0)) { return; }
+
+            Debug.Log($"Color picked! color: {color}");
+
+            // change color data
+            currentData.colorVariants[currentData.selectedIndex].newColors[index] = color;
+
+            // update user interface
+            UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + index, color);
+
+            onColorDataChange?.Invoke();
         }
 
         private void UpdateUserInterface(DataHolder data)
@@ -358,6 +390,25 @@ namespace FileManagement
             UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
 
             UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
+        }
+
+        private void UpdateShaderInfo(DataHolder data = null)
+        {
+            if(data != null) 
+            {
+                shaderMaterial.SetColorArray("_OldColor", data.originalColors);
+                shaderMaterial.SetColorArray("_NewColor", data.colorVariants[data.selectedIndex].newColors);
+                return;
+            }
+
+            shaderMaterial.SetColorArray("_OldColor", currentData.originalColors);
+            shaderMaterial.SetColorArray("_NewColor", currentData.colorVariants[currentData.selectedIndex].newColors);
+        }
+        private void UpdateShaderImage()
+        {
+            Texture2D processedTexture = TextureUtils.GetShaderTexture(currentData.originalTexture, shaderMaterial);
+            processedTexture.filterMode = FilterMode.Point;
+            UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
         }
 
         private void ClearDynamicUserInterface()
