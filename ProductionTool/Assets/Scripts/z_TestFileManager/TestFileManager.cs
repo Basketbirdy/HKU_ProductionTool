@@ -1,6 +1,5 @@
 using System.IO;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using SFB;
@@ -149,6 +148,5 @@ public class TestFileManager : MonoBehaviour
         streamWriter.Close();
         streamWriter.Dispose();
 
-        AssetDatabase.Refresh();
     }
 }

@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System.Data;
 using System.IO;
 using UnityEditor;
-using Unity.VisualScripting;
 
 public class InterfaceGenerator : MonoBehaviour
 {
@@ -47,7 +45,7 @@ public class InterfaceGenerator : MonoBehaviour
         streamWriter.Flush();
         streamWriter.Close();
 
-        AssetDatabase.Refresh();
+        //AssetDatabase.Refresh();
     }
 
     private void Include(StringBuilder sb)
