@@ -22,7 +22,7 @@ namespace FileManagement
 
         [Header("Project")]
         private DataHandler dataHandler;
-        private DataHolder currentData;
+        [SerializeField] private DataHolder currentData;
 
         [SerializeField] private ColorPicker colorPicker;
 
@@ -111,10 +111,9 @@ namespace FileManagement
             UserInterfaceHandler.instance.AddScrollViewRef(colorEntryScrollViewId);
 
             // shader
-            shaderMaterial.SetColor("_OldColor", oldColor);
-            shaderMaterial.SetColor("_NewColor", newColor);
 
             // events
+            onColorDataChange += UpdateShaderInfo;
             onColorDataChange += UpdateShaderImage;
         }
 
@@ -139,6 +138,7 @@ namespace FileManagement
             }
 
             // events
+            onColorDataChange -= UpdateShaderInfo;
             onColorDataChange -= UpdateShaderImage;
         }
 
@@ -314,7 +314,9 @@ namespace FileManagement
             {
                 Color[] newColors = currentData.colorVariants[i].newColors;
                 Material tempMaterial = shaderMaterial;
-                tempMaterial.SetColorArray("_newColors", newColors);
+                Texture2D outputTexture = TextureUtils.CreateColorTexture1D(newColors);
+                tempMaterial.SetTexture("_OutputColors", outputTexture);
+
                 textures[i] = TextureUtils.GetShaderTexture(currentData.originalTexture, tempMaterial);
             }
             return textures;
@@ -332,7 +334,7 @@ namespace FileManagement
         {
             for(int i = 0; i < currentData.originalColors.Length; i++)
             {
-                if(i == 0) { continue; }
+                //if(i == 0) { continue; }
 
                 // Create ui from template
                 int colorIndex = i;
@@ -406,18 +408,17 @@ namespace FileManagement
             UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
         }
 
-        private void UpdateShaderInfo(DataHolder data = null)
+        private void UpdateShaderInfo()
         {
-            if(data != null) 
-            {
-                shaderMaterial.SetColorArray("_OldColors", data.originalColors);
-                shaderMaterial.SetColorArray("_NewColors", data.colorVariants[data.selectedIndex].newColors);
-                return;
-            }
+            Texture2D baseTexture = TextureUtils.CreateColorTexture1D(currentData.originalColors);
+            baseTexture.filterMode = FilterMode.Point;
+            shaderMaterial.SetTexture("_BaseColors", baseTexture);
 
-            shaderMaterial.SetColorArray("_OldColors", currentData.originalColors);
-            shaderMaterial.SetColorArray("_NewColors", currentData.colorVariants[currentData.selectedIndex].newColors);
+            Texture2D outputTexture = TextureUtils.CreateColorTexture1D(currentData.colorVariants[currentData.selectedIndex].newColors);
+            outputTexture.filterMode = FilterMode.Point;
+            shaderMaterial.SetTexture("_OutputColors", outputTexture);
         }
+
         private void UpdateShaderImage()
         {
             Texture2D processedTexture = TextureUtils.GetShaderTexture(currentData.originalTexture, shaderMaterial);

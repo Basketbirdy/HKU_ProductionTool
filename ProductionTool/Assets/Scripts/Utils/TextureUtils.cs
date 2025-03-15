@@ -190,7 +190,9 @@ public static class TextureUtils
 
         for (int i = 0; i < pixels.Length; i++)
         {
+            if (pixels[i] == new Color()) { continue; }
             colors.Add(pixels[i]);
+            Debug.Log($"Color identified as {pixels[i]}");
         }
 
         return colors.ToArray(); // returns an array so the indexes are known

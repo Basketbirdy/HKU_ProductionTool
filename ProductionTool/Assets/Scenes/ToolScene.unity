@@ -238,6 +238,9 @@ MonoBehaviour:
     selectedColor:
       serializedVersion: 2
       rgba: 4294967295
+    colorPickerId: Element_ColorPickerBackground
+    oldColorIndicatorId: Element_ColorPicker_OldColor
+    newColorIndicatorId: Element_ColorPicker_NewColor
     redSliderId: SliderInt_ColorPicker_Red
     greenSliderId: SliderInt_ColorPicker_Green
     blueSliderId: SliderInt_ColorPicker_Blue
@@ -245,6 +248,8 @@ MonoBehaviour:
     greenIntegerFieldId: IntegerField_ColorPicker_Green
     blueIntegerFieldId: IntegerField_ColorPicker_Blue
     hexTextFieldId: TextField_ColorPicker_Hex
+    applyButtonId: Button_ColorPicker_Apply
+    cancelButtonId: Button_ColorPicker_Cancel
   colorEntryScrollViewId: ScrollView_ColorContainer
   colorEntryDefaultId: Element_VariantColorEntry
   colorEntryOriginalColorDefaultId: Element_OriginalColor
@@ -257,7 +262,7 @@ MonoBehaviour:
   variantButtonAreaId: VariantContainerMask
   variantButtonDefaultId: Button_Variant
   variantButtonTemplate: {fileID: 9197481963319205126, guid: f7a8b9014f718d4429417375b4f36a70, type: 3}
-  shader: {fileID: 4800000, guid: 625491346d4930d49b8d0ecc2a0d4a72, type: 3}
+  shader: {fileID: 4800000, guid: 298309fee0121ee45a9e77f6a394b70c, type: 3}
   oldColor: {r: 0.078431375, g: 0.0627451, b: 0.07450981, a: 1}
   newColor: {r: 0.14117648, g: 0.15294118, b: 0.17254902, a: 1}
   exportButtonId: Button_Export
