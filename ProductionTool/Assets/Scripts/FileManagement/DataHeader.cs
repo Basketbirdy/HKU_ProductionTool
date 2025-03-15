@@ -1,21 +1,15 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewDataHeader", menuName = "ScriptableObjects/DataHeader")]
-public class DataHeader : ScriptableObject
+[System.Serializable]
+public class DataHeader
 {
     public string version;
     public string date;
 
-    public DataHeader(DataHeader defaultDataHeader)
+    public DataHeader(string version, string date)
     {
-        version = defaultDataHeader.version;
-        date = DateTime.Now.ToString();
-    }
-
-    public void OnCreateDataHeader(DataHeader defaultDataHeader)
-    {
-        version = defaultDataHeader.version;
-        date = DateTime.Now.ToString();
+        this.version = version;
+        this.date = date;
     }
 }

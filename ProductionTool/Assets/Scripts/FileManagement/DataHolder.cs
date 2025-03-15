@@ -7,11 +7,6 @@ namespace FileManagement
     [CreateAssetMenu(fileName = "NewData", menuName = "ScriptableObjects/Data")]
     public class DataHolder : ScriptableObject
     {
-        // meta data
-        public DataHeader metaData;
-
-        [Space]
-
         [Header("Instance data")]
         public string fileName;
         public Texture2D originalTexture;
@@ -30,7 +25,6 @@ namespace FileManagement
 
         public DataHolder(DataHolder defaultData) 
         {
-            metaData = defaultData.metaData;
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
 
@@ -43,7 +37,6 @@ namespace FileManagement
 
         public void OnCreateDataHolder(DataHolder defaultData)
         {
-            metaData = defaultData.metaData;
             fileName = defaultData.fileName;
             originalTexture = defaultData.originalTexture;
 

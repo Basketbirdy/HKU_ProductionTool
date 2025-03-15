@@ -30,10 +30,10 @@ namespace FileManagement
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public DataHolder ImportExistingProject(string path)
+        public ImportData ImportExistingProject(string path)
         {
             Debug.LogWarning($"TODO - Implement importing existing project");
-            return null;
+            return new ImportData();
         }
 
         //private void OnImport()
@@ -76,5 +76,11 @@ namespace FileManagement
         //    string fileName = Path.GetFileName(url);
         //    UserInterfaceHandler.instance.SetLabel("Label_Filename", fileName);
         //}
+    }
+
+    public struct ImportData
+    {
+        public DataHeader metadata;
+        public DataHolder data;
     }
 }

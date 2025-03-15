@@ -22,6 +22,7 @@ namespace FileManagement
 
         [Header("Project")]
         private DataHandler dataHandler;
+        [SerializeField] private DataHeader currentMetadata;
         [SerializeField] private DataHolder currentData;
 
         [SerializeField] private ColorPicker colorPicker;
@@ -36,7 +37,7 @@ namespace FileManagement
         [Space]
         [SerializeField] private string addVariantButtonid = "Button_AddVariant";
         [SerializeField] private string removeVariantButtonid = "Button_RemoveVariant";
-        [SerializeField] private string variantButtonId = "Button_Variant";
+        //[SerializeField] private string variantButtonId = "Button_Variant";
         [SerializeField] private string variantButtonAreaId = "VariantContainerMask";
         [SerializeField] private string variantButtonDefaultId = "Button_Variant";
         [SerializeField] private VisualTreeAsset variantButtonTemplate;
@@ -48,6 +49,9 @@ namespace FileManagement
         [SerializeField] private Color newColor;
 
         [Header("Saving")]
+        [SerializeField] private string saveButtonId = "Button_Save";
+        [SerializeField] private string saveAsButtonId = "Button_SaveAs";
+        [SerializeField] private string currentSavePath;
         private SaveHandler saveHandler;
 
         [Header("Exporting")]
@@ -69,7 +73,7 @@ namespace FileManagement
         {
             importHandler = new ImportHandler();
             dataHandler = new DataHandler(defaultData);
-            saveHandler = new SaveHandler();
+            saveHandler = new SaveHandler(".cosw");
             exportHandler = new ExportHandler();
 
             shaderMaterial = new Material(shader);
@@ -87,11 +91,16 @@ namespace FileManagement
             UserInterfaceHandler.instance.AddButtonRef(exportButtonId);
             UserInterfaceHandler.instance.AddButtonListener(exportButtonId, OnExportButtonPressed);
 
+            UserInterfaceHandler.instance.AddButtonRef(saveButtonId);
+            UserInterfaceHandler.instance.AddButtonListener(saveButtonId, OnSaveButtonPressed);
+            UserInterfaceHandler.instance.AddButtonRef(saveAsButtonId);
+            UserInterfaceHandler.instance.AddButtonListener(saveAsButtonId, OnSaveAsButtonPressed);
+
             UserInterfaceHandler.instance.AddButtonRef(addVariantButtonid);
             UserInterfaceHandler.instance.AddButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
             UserInterfaceHandler.instance.AddButtonRef(removeVariantButtonid);
             UserInterfaceHandler.instance.AddButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
-            UserInterfaceHandler.instance.AddButtonRef(variantButtonId);
+            //UserInterfaceHandler.instance.AddButtonRef(variantButtonId);
                 // dropdowns
             UserInterfaceHandler.instance.AddDropdownRef(exportContentDropdownId);
             UserInterfaceHandler.instance.AddDropdownListener(exportContentDropdownId, OnExportContentChange);
@@ -110,8 +119,6 @@ namespace FileManagement
             // scrollviews
             UserInterfaceHandler.instance.AddScrollViewRef(colorEntryScrollViewId);
 
-            // shader
-
             // events
             onColorDataChange += OnColorDataChange;
         }
@@ -125,6 +132,9 @@ namespace FileManagement
 
             UserInterfaceHandler.instance.RemoveButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
             UserInterfaceHandler.instance.RemoveButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
+
+            UserInterfaceHandler.instance.RemoveButtonListener(saveButtonId, OnSaveButtonPressed);
+            UserInterfaceHandler.instance.RemoveButtonListener(saveAsButtonId, OnSaveAsButtonPressed);
 
             // dropdowns
             UserInterfaceHandler.instance.RemoveDropdownListener(exportContentDropdownId, OnExportContentChange);
@@ -159,11 +169,16 @@ namespace FileManagement
             string extension = Path.GetExtension(url[0]);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
             {
-                currentData = dataHandler.CreateFreshProject(url[0], CurrentVersion);
+                currentMetadata = dataHandler.CreateMetadata(CurrentVersion);
+                currentData = dataHandler.CreateFreshProject(url[0]);
+                currentSavePath = "";
             }
             else if(extension == ".cosw")
             {
-                currentData = importHandler.ImportExistingProject(url[0]);
+                ImportData import = importHandler.ImportExistingProject(url[0]);
+                currentMetadata = import.metadata;
+                currentData = import.data;
+                currentSavePath = url[0];
             }
             else
             {
@@ -183,7 +198,25 @@ namespace FileManagement
 
         private void OnSaveButtonPressed()
         {
+            if(currentData == null) { return; }
+            if(currentSavePath == null || currentSavePath == "") { OnSaveAsButtonPressed(); return; }
 
+            saveHandler.Save(currentSavePath, currentData, currentMetadata);
+        }
+        private void OnSaveAsButtonPressed()
+        {
+            if(currentData == null) { return; }
+
+            var extensions = new[]
+            {
+                new ExtensionFilter("Project files", "cosw")
+            };
+
+            string path = GetSavePath("Save file", Application.persistentDataPath, "New_ColorVariations", extensions);
+            if(path == "") { return; }
+
+            saveHandler.Save(path, currentData, currentMetadata);
+            currentSavePath = path;
         }
 
         private void OnExportButtonPressed()
@@ -193,10 +226,13 @@ namespace FileManagement
             string defaultName = "ColorVariants" + "_" + currentTime;
 
             // get url to export to
-            var url = StandaloneFileBrowser.SaveFilePanel("Open File", Application.persistentDataPath, defaultName, "");
-            if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
-            if (File.Exists(url)) { Debug.LogWarning($"File already exists at path! cancelling export"); return; }
+            string url = GetSavePath("Export file", Application.persistentDataPath, defaultName, null);
+            if(url == "") { return; }
             Debug.Log($"Path selected: {url}");
+
+            //var url = StandaloneFileBrowser.SaveFilePanel("Open File", Application.persistentDataPath, defaultName, "");
+            //if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
+            //if (File.Exists(url)) { Debug.LogWarning($"File already exists at path! cancelling export"); return; }
 
             // get the textures to export 
             ExportOptions exportOptions = currentData.exportOptions;
@@ -217,6 +253,13 @@ namespace FileManagement
             }
 
             exportHandler.Export(url, texturesToExport, exportOptions.fileType);
+        }
+        private string GetSavePath(string title, string directory, string defaultName, ExtensionFilter[] extensions)
+        {
+            var url = StandaloneFileBrowser.SaveFilePanel("Open File", directory, defaultName, extensions);
+            if (url.Length == 0) { Debug.LogWarning($"No url selected"); return null; }
+            Debug.Log($"Path selected: {url}");
+            return url;
         }
 
         private void OnAddVariantButtonClicked()
@@ -483,8 +526,8 @@ namespace FileManagement
 
             Debug.Log($"Filename: {currentData.fileName}");
             Debug.Log($"-----------Metadata-------------");
-            Debug.Log($"version: {currentData.metaData.version}");
-            Debug.Log($"Date: {currentData.metaData.date}");
+            Debug.Log($"version: {currentMetadata.version}");
+            Debug.Log($"Date: {currentMetadata.date}");
             Debug.Log($"--------------------------------");
 
             int count = 0;

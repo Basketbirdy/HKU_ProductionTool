@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,21 +23,14 @@ namespace FileManagement
         /// <param name="url"></param>
         /// <param name="version"></param>
         /// <returns></returns>
-        public DataHolder CreateFreshProject(string url, string version)
+        public DataHolder CreateFreshProject(string url)
         {
             // TODO - create instance of SavaData class filled with default values and provided image
             //Debug.LogWarning($"TODO - Implement creating fresh project data");
 
-            // create metadata
-            DataHeader metaData = (DataHeader)ScriptableObject.CreateInstance("DataHeader");
-            metaData.OnCreateDataHeader(defaultData.metaData);
-            metaData.version = version;
-            metaData.date = System.DateTime.Now.ToString();
-
             // create data instance
             DataHolder newProjectData = (DataHolder)ScriptableObject.CreateInstance("DataHolder");
             newProjectData.OnCreateDataHolder(defaultData);
-            newProjectData.metaData = metaData;
 
             newProjectData.fileName = Path.GetFileName(url);
             newProjectData.originalTexture = TextureUtils.LoadImage(url);
@@ -48,6 +42,17 @@ namespace FileManagement
             newProjectData.colorVariants.Add(new ColorVariant("DefaultVariant", newProjectData.originalColors));
 
             return newProjectData;
+        }
+
+        public DataHeader CreateMetadata(string version)
+        {
+            // create metadata
+            string date = System.DateTime.Now.ToString("yyyyMMddHHmmss"); ;
+            DataHeader metadata = new DataHeader(version, date);
+            //DataHeader metaData = (DataHeader)ScriptableObject.CreateInstance("DataHeader");
+            //metaData.version = version;
+            //metaData.date = System.DateTime.Now.ToString();
+            return metadata;
         }
     }
 }
