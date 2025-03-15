@@ -1,25 +1,24 @@
 using UnityEngine;
 using System.IO;
+using System;
 
 namespace FileManagement
 {
     public class SaveHandler
     {
-        private string extension;
 
-        public SaveHandler(string extension) { this.extension = extension; }
-
-        public void Save(string url, DataHolder data, DataHeader metadata)
+        public void Save(string url, DataHolder data, string version)
         {
-            Debug.LogWarning("DOING - Converting data to string and saving it at specified url");
+            if(url == "" || url == null) { Debug.Log("No path provided! returning"); return; }
+            Debug.Log($"Saving to path: {url}");
 
             // create and fill out save data class
             SaveData savedata = new SaveData();
 
-            string texture = TextureToString(data.originalTexture);
+            string texture = TextureUtils.TextureToString(data.originalTexture);
 
             savedata.Initialize(
-                metadata,
+                new DataHeader(version, System.DateTime.Now.ToString("yyyyMMddHHmmss")),
                 data.fileName,
                 texture,
                 data.originalColors,
@@ -34,22 +33,10 @@ namespace FileManagement
 
         private void WriteToFile(string url, string data)
         {
-            if(File.Exists(url))
-            {
-                url = Path.GetFileNameWithoutExtension(url);
-            }
-            StreamWriter streamWrites = new StreamWriter(url + extension, false);
+            StreamWriter streamWrites = new StreamWriter(url, false);
             streamWrites.WriteLine(data);
             streamWrites.Close();
             streamWrites.Dispose();
-        }
-
-        private string TextureToString(Texture2D texture)
-        {
-            byte[] bytes = texture.EncodeToPNG();
-            string byteString = System.Convert.ToBase64String(bytes);
-            Debug.Log($"Bytestring: {byteString}");
-            return byteString;
         }
     }
 }

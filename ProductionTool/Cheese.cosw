@@ -1,7 +1,7 @@
 {
     "metadata": {
-        "version": "0.3.2",
-        "date": "20250315153702"
+        "version": "0.3.3",
+        "date": "20250315172613"
     },
     "filename": "Cheese.png",
     "originalTexture": "iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAYAAACkTj4ZAAABN0lEQVQoFY2SPUtCYRTHz1UIDLpSg4SL0eQYCEGDTUKjqx/CSUdnx5r6CA6ujkKD1BAEgYODLmKCGuILpdgLpPI/8r88PlewA/c57797Hs7jyD8ldxNYsfSuunRoU/sCTFATcB0/0NBj85cpMYEBL2oZABBym73aghDKPJK+icwkCtCUTiVgSuXhVTX9/P2z+phsC0QIJrCbtMM4JqOBesVyR6/ogUyIUe8zCWACIEgQhw3BNK32QOLnUaRVAPhazOWp3pfu+0xip0caPzlcSav3I8FdEGzmbfQn359DibiOAtAFCKVUGwsgEIB0a9wKi7gV+rY2nwBzCsLY/JIXm+sARhvFjfZUjt2QEJK+DCuj8vKh2uHVCpkzDfBA4z4hxFs/YfzLLgCb7Bxft2/9dqHps8mM0V4D05yOi4Xc5skAAAAASUVORK5CYII=",
@@ -139,6 +139,41 @@
                     "r": 1.0,
                     "g": 0.7019608020782471,
                     "b": 1.0,
+                    "a": 1.0
+                }
+            ]
+        },
+        {
+            "name": "Button_Variant3",
+            "newColors": [
+                {
+                    "r": 0.0,
+                    "g": 0.27843138575553896,
+                    "b": 0.007843137718737126,
+                    "a": 1.0
+                },
+                {
+                    "r": 0.0,
+                    "g": 0.4901960790157318,
+                    "b": 0.06666667014360428,
+                    "a": 1.0
+                },
+                {
+                    "r": 0.0,
+                    "g": 0.6235294342041016,
+                    "b": 0.13333334028720857,
+                    "a": 1.0
+                },
+                {
+                    "r": 0.0,
+                    "g": 0.43529412150382998,
+                    "b": 0.0313725508749485,
+                    "a": 1.0
+                },
+                {
+                    "r": 0.0,
+                    "g": 0.7019608020782471,
+                    "b": 0.23137255012989045,
                     "a": 1.0
                 }
             ]

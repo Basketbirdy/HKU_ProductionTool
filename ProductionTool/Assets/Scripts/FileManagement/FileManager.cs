@@ -26,6 +26,7 @@ namespace FileManagement
         [SerializeField] private DataHolder currentData;
 
         [SerializeField] private ColorPicker colorPicker;
+        [SerializeField] private int maxColors = 256;
 
         [Header("ColorVariants")]
         [SerializeField] private string colorEntryScrollViewId = "ScrollView_ColorContainer";
@@ -73,7 +74,7 @@ namespace FileManagement
         {
             importHandler = new ImportHandler();
             dataHandler = new DataHandler(defaultData);
-            saveHandler = new SaveHandler(".cosw");
+            saveHandler = new SaveHandler();
             exportHandler = new ExportHandler();
 
             shaderMaterial = new Material(shader);
@@ -172,10 +173,18 @@ namespace FileManagement
                 currentMetadata = dataHandler.CreateMetadata(CurrentVersion);
                 currentData = dataHandler.CreateFreshProject(url[0]);
                 currentSavePath = "";
+
+                if(currentData.originalColors.Length > maxColors)
+                {
+                    Debug.LogError("Too many different colors! abandoning import");
+                    currentData = null;
+                    return;
+                }
             }
             else if(extension == ".cosw")
             {
-                ImportData import = importHandler.ImportExistingProject(url[0]);
+                ImportData import = importHandler.ImportExistingProject(url[0], defaultData);
+                if(import.metadata == null || import.data == null) { Debug.LogWarning("Importing data failed! TODO - error screen"); return; }
                 currentMetadata = import.metadata;
                 currentData = import.data;
                 currentSavePath = url[0];
@@ -189,34 +198,11 @@ namespace FileManagement
             UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
             UserInterfaceHandler.instance.SetLabel(filenameLabelId, currentData.fileName);
 
-            UpdateShaderInfo();
-            UpdateShaderImage();
-
             EvaluateColorVariants();
             EvaluateColorEntries();
-        }
 
-        private void OnSaveButtonPressed()
-        {
-            if(currentData == null) { return; }
-            if(currentSavePath == null || currentSavePath == "") { OnSaveAsButtonPressed(); return; }
-
-            saveHandler.Save(currentSavePath, currentData, currentMetadata);
-        }
-        private void OnSaveAsButtonPressed()
-        {
-            if(currentData == null) { return; }
-
-            var extensions = new[]
-            {
-                new ExtensionFilter("Project files", "cosw")
-            };
-
-            string path = GetSavePath("Save file", Application.persistentDataPath, "New_ColorVariations", extensions);
-            if(path == "") { return; }
-
-            saveHandler.Save(path, currentData, currentMetadata);
-            currentSavePath = path;
+            UpdateShaderInfo();
+            UpdateShaderImage();
         }
 
         private void OnExportButtonPressed()
@@ -254,6 +240,30 @@ namespace FileManagement
 
             exportHandler.Export(url, texturesToExport, exportOptions.fileType);
         }
+
+        private void OnSaveButtonPressed()
+        {
+            if(currentData == null) { return; }
+            if(currentSavePath == null || currentSavePath == "") { OnSaveAsButtonPressed(); return; }
+
+            saveHandler.Save(currentSavePath, currentData, CurrentVersion);
+        }
+        private void OnSaveAsButtonPressed()
+        {
+            if(currentData == null) { return; }
+
+            var extensions = new[]
+            {
+                new ExtensionFilter("Project files", "cosw")
+            };
+
+            string path = GetSavePath("Save file", Application.persistentDataPath, "New_ColorVariations", extensions);
+            if(path == "") { return; }
+
+            saveHandler.Save(path, currentData, CurrentVersion);
+            currentSavePath = path;
+        }
+
         private string GetSavePath(string title, string directory, string defaultName, ExtensionFilter[] extensions)
         {
             var url = StandaloneFileBrowser.SaveFilePanel("Open File", directory, defaultName, extensions);
@@ -270,7 +280,7 @@ namespace FileManagement
             Debug.Log("Add variant clicked!");
             int variantIndex = currentData.colorVariants.Count;
             string desiredKey = variantButtonDefaultId + variantIndex;
-            currentData.variantIndexStrings.Add(variantIndex, desiredKey);
+            currentData.variantButtonIndexStrings.Add(variantIndex, desiredKey);
             UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
 
             UserInterfaceHandler.instance.AddButtonRef(desiredKey);
@@ -297,11 +307,13 @@ namespace FileManagement
 
         private void EvaluateColorVariants()
         {
+            //currentData.variantButtonIndexStrings.Clear();
+
             for(int i = 0; i < currentData.colorVariants.Count; i++)
             {
-                int variantIndex = currentData.colorVariants.Count - 1;
+                int variantIndex = i;
                 string desiredKey = variantButtonDefaultId + variantIndex;
-                currentData.variantIndexStrings.Add(variantIndex, desiredKey);
+                currentData.variantButtonIndexStrings.Add(variantIndex, desiredKey);
                 UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
                 UserInterfaceHandler.instance.AddButtonRef(desiredKey);
                 UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());

@@ -197,4 +197,22 @@ public static class TextureUtils
 
         return colors.ToArray(); // returns an array so the indexes are known
     }
+
+    public static string TextureToString(Texture2D texture)
+    {
+        byte[] bytes = texture.EncodeToPNG();
+        string byteString = System.Convert.ToBase64String(bytes);
+        Debug.Log($"Bytestring: {byteString}");
+        return byteString;
+    }
+
+    public static Texture2D StringToTexture(string textureString)
+    {
+        byte[] bytes = System.Convert.FromBase64String(textureString);
+        Texture2D texture = new Texture2D(2, 2);
+        texture.LoadImage(bytes);
+        texture.filterMode = FilterMode.Point;
+
+        return texture;
+    }
 }
