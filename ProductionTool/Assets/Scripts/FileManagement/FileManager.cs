@@ -113,8 +113,7 @@ namespace FileManagement
             // shader
 
             // events
-            onColorDataChange += UpdateShaderInfo;
-            onColorDataChange += UpdateShaderImage;
+            onColorDataChange += OnColorDataChange;
         }
 
         private void OnDisable()
@@ -138,8 +137,7 @@ namespace FileManagement
             }
 
             // events
-            onColorDataChange -= UpdateShaderInfo;
-            onColorDataChange -= UpdateShaderImage;
+            onColorDataChange -= OnColorDataChange;
         }
 
         private void OnImportButtonPressed()
@@ -231,8 +229,10 @@ namespace FileManagement
             string desiredKey = variantButtonDefaultId + variantIndex;
             currentData.variantIndexStrings.Add(variantIndex, desiredKey);
             UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
+
             UserInterfaceHandler.instance.AddButtonRef(desiredKey);
             UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
+            UserInterfaceHandler.instance.AddButtonListener<int>(desiredKey, OnVariantButtonClicked, variantIndex);
 
             // create new variant
             currentData.colorVariants.Add(new ColorVariant(desiredKey, currentData.originalColors));
@@ -241,6 +241,15 @@ namespace FileManagement
         {
             Debug.Log("Remove variant clicked!");
  
+        }
+        private void OnVariantButtonClicked(int index)
+        {
+            SelectVariant(index);
+        }
+        private void SelectVariant(int index)
+        {
+            currentData.selectedIndex = index;
+            onColorDataChange?.Invoke();
         }
 
         private void EvaluateColorVariants()
@@ -253,6 +262,7 @@ namespace FileManagement
                 UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
                 UserInterfaceHandler.instance.AddButtonRef(desiredKey);
                 UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
+                UserInterfaceHandler.instance.AddButtonListener<int>(desiredKey, OnVariantButtonClicked, variantIndex);
             }
         }
 
@@ -390,10 +400,6 @@ namespace FileManagement
 
             // change color data
             currentData.colorVariants[currentData.selectedIndex].newColors[index] = color;
-
-            // update user interface
-            UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + index, color);
-
             onColorDataChange?.Invoke();
         }
 
@@ -408,6 +414,19 @@ namespace FileManagement
             UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
         }
 
+        private void OnColorDataChange()
+        {
+            UpdateColorEntryButtons();
+            UpdateShaderInfo();
+            UpdateShaderImage();
+        }
+        private void UpdateColorEntryButtons()
+        {
+            for(int i = 0; i < currentData.originalColors.Length; i++)
+            {
+                UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + i, currentData.colorVariants[currentData.selectedIndex].newColors[i]);
+            }
+        }
         private void UpdateShaderInfo()
         {
             Texture2D baseTexture = TextureUtils.CreateColorTexture1D(currentData.originalColors);
@@ -442,6 +461,7 @@ namespace FileManagement
             for(int i = 0; i < currentData.colorVariants.Count; i++)
             {
                 // remove any references
+                UserInterfaceHandler.instance.RemoveButtonListener<int>(variantButtonDefaultId + i.ToString());
                 UserInterfaceHandler.instance.RemoveButtonRef(variantButtonDefaultId + i.ToString());
 
             }
