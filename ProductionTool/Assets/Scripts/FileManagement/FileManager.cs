@@ -16,32 +16,25 @@ namespace FileManagement
         [HideInInspector] [SerializeField] private int patchVersion;
         public string CurrentVersion => string.Join(".", majorVersion, minorVersion, patchVersion);
 
+        [Header("User interface")]
+        [SerializeField] private UserInterfaceIdentifiers userInterfaceIdentifiers;
+        private ToolUserInterfaceHandler toolUserInterfaceHandler;
+
         [Header("Importing")]
-        [SerializeField] private string importButtonId;
         private ImportHandler importHandler;
 
         [Header("Project")]
-        private DataHandler dataHandler;
         [SerializeField] private DataHeader currentMetadata;
         [SerializeField] private DataHolder currentData;
+        private DataHandler dataHandler;
 
         [SerializeField] private ColorPicker colorPicker;
         [SerializeField] private int maxColors = 256;
 
         [Header("ColorVariants")]
-        [SerializeField] private string colorEntryScrollViewId = "ScrollView_ColorContainer";
-        [SerializeField] private string colorEntryDefaultId = "Element_VariantColorEntry";
-        [SerializeField] private string colorEntryOriginalColorDefaultId = "Element_OriginalColor";
-        [SerializeField] private string colorEntryIndexLabelDefaultId = "Label_VariantIndex";
-        [SerializeField] private string colorEntryNewColorButtonDefaultId = "Button_NewColor";
         [SerializeField] private VisualTreeAsset colorEntryTemplate;
-        [Space]
-        [SerializeField] private string addVariantButtonid = "Button_AddVariant";
-        [SerializeField] private string removeVariantButtonid = "Button_RemoveVariant";
-        //[SerializeField] private string variantButtonId = "Button_Variant";
-        [SerializeField] private string variantButtonAreaId = "VariantContainerMask";
-        [SerializeField] private string variantButtonDefaultId = "Button_Variant";
         [SerializeField] private VisualTreeAsset variantButtonTemplate;
+
 
         [Header("Shader")]
         [SerializeField] private Shader shader;
@@ -50,32 +43,23 @@ namespace FileManagement
         [SerializeField] private Color newColor;
 
         [Header("Saving")]
-        [SerializeField] private string saveButtonId = "Button_Save";
-        [SerializeField] private string saveAsButtonId = "Button_SaveAs";
         [SerializeField] private string currentSavePath;
         private SaveHandler saveHandler;
 
         [Header("Exporting")]
-        [SerializeField] private string exportButtonId = "Button_Export";
-        [SerializeField] private string exportContentDropdownId = "Dropdown_ExportContent";
-        [SerializeField] private string exportFiletypeDropdownId = "Dropdown_ExportFiletype";
         private ExportHandler exportHandler;
-
-        [Header("Dynamic User Interface Ids")]
-        [SerializeField] private string originalSpriteId = "Sprite_Original";
-        [SerializeField] private string processedSpriteId = "Sprite_Processed";
-        [SerializeField] private string filenameLabelId = "Label_Filename";
 
         [Header("Events")]
         public static Action onColorDataChange;
 
-
+        // base monobehaviour -------------------------------------------------
         private void Awake()
         {
             importHandler = new ImportHandler();
             dataHandler = new DataHandler(defaultData);
             saveHandler = new SaveHandler();
             exportHandler = new ExportHandler();
+            toolUserInterfaceHandler = new ToolUserInterfaceHandler(userInterfaceIdentifiers, variantButtonTemplate, colorEntryTemplate);
 
             shaderMaterial = new Material(shader);
         }
@@ -84,41 +68,19 @@ namespace FileManagement
         {
             colorPicker.Initialize();
 
-            // static ui
-                // buttons
-            UserInterfaceHandler.instance.AddButtonRef(importButtonId);
-            UserInterfaceHandler.instance.AddButtonListener(importButtonId, OnImportButtonPressed);
-
-            UserInterfaceHandler.instance.AddButtonRef(exportButtonId);
-            UserInterfaceHandler.instance.AddButtonListener(exportButtonId, OnExportButtonPressed);
-
-            UserInterfaceHandler.instance.AddButtonRef(saveButtonId);
-            UserInterfaceHandler.instance.AddButtonListener(saveButtonId, OnSaveButtonPressed);
-            UserInterfaceHandler.instance.AddButtonRef(saveAsButtonId);
-            UserInterfaceHandler.instance.AddButtonListener(saveAsButtonId, OnSaveAsButtonPressed);
-
-            UserInterfaceHandler.instance.AddButtonRef(addVariantButtonid);
-            UserInterfaceHandler.instance.AddButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
-            UserInterfaceHandler.instance.AddButtonRef(removeVariantButtonid);
-            UserInterfaceHandler.instance.AddButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
-            //UserInterfaceHandler.instance.AddButtonRef(variantButtonId);
-                // dropdowns
-            UserInterfaceHandler.instance.AddDropdownRef(exportContentDropdownId);
-            UserInterfaceHandler.instance.AddDropdownListener(exportContentDropdownId, OnExportContentChange);
-            UserInterfaceHandler.instance.AddDropdownRef(exportFiletypeDropdownId);
-            UserInterfaceHandler.instance.AddDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
-
-            // dynamic ui
-                // visual elements - images
-            UserInterfaceHandler.instance.AddVisualElementRef(originalSpriteId);
-            UserInterfaceHandler.instance.AddVisualElementRef(processedSpriteId);
-
-            UserInterfaceHandler.instance.AddVisualElementRef(variantButtonAreaId);
-                // labels - text
-            UserInterfaceHandler.instance.AddLabelRef(filenameLabelId);
-
-            // scrollviews
-            UserInterfaceHandler.instance.AddScrollViewRef(colorEntryScrollViewId);
+            // create ui toolkit references
+            toolUserInterfaceHandler.InitializeReferences();
+            // add listeners to buttons
+            toolUserInterfaceHandler.InitializeButtons(
+                OnImportButtonPressed,
+                OnExportButtonPressed,
+                OnSaveButtonPressed,
+                OnSaveAsButtonPressed,
+                OnAddVariantButtonClicked,
+                OnRemoveVariantButtonClicked,
+                OnExportContentChange,
+                OnExportFiletypeChange
+                );
 
             // events
             onColorDataChange += OnColorDataChange;
@@ -126,31 +88,23 @@ namespace FileManagement
 
         private void OnDisable()
         {
-            // static ui
-                // buttons
-            UserInterfaceHandler.instance.RemoveButtonListener(importButtonId, OnImportButtonPressed);
-            UserInterfaceHandler.instance.RemoveButtonListener(exportButtonId, OnExportButtonPressed);
-
-            UserInterfaceHandler.instance.RemoveButtonListener(addVariantButtonid, OnAddVariantButtonClicked);
-            UserInterfaceHandler.instance.RemoveButtonListener(removeVariantButtonid, OnRemoveVariantButtonClicked);
-
-            UserInterfaceHandler.instance.RemoveButtonListener(saveButtonId, OnSaveButtonPressed);
-            UserInterfaceHandler.instance.RemoveButtonListener(saveAsButtonId, OnSaveAsButtonPressed);
-
-            // dropdowns
-            UserInterfaceHandler.instance.RemoveDropdownListener(exportContentDropdownId, OnExportContentChange);
-            UserInterfaceHandler.instance.RemoveDropdownListener(exportFiletypeDropdownId, OnExportFiletypeChange);
-
-            // dynamic ui
-            for(int i = 0; i < currentData.originalColors.Length; i++)
-            {
-                UserInterfaceHandler.instance.RemoveButtonListener<int>(colorEntryNewColorButtonDefaultId + i);
-            }
+            // remove any button listeners
+            toolUserInterfaceHandler.OnDisable(currentData.originalColors.Length,
+                OnImportButtonPressed,
+                OnExportButtonPressed,
+                OnSaveButtonPressed,
+                OnSaveAsButtonPressed,
+                OnAddVariantButtonClicked,
+                OnRemoveVariantButtonClicked,
+                OnExportContentChange,
+                OnExportFiletypeChange
+                );
 
             // events
             onColorDataChange -= OnColorDataChange;
         }
 
+        // main button events ----------------------------------------
         private void OnImportButtonPressed()
         {
             if(currentData != null) { /* ask for confirmation */ }
@@ -164,12 +118,14 @@ namespace FileManagement
             if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
             Debug.Log($"Path selected: {url[0]}; File extension: {Path.GetExtension(url[0])}");
 
-            ClearDynamicUserInterface();
+            // if there is data, clear the dynamic user interface (variant buttons & color entries)
+            if (currentData != null) { toolUserInterfaceHandler.ClearDynamicUserInterface(currentData.originalColors.Length , currentData.colorVariants.Count); }
 
             // check file extension
             string extension = Path.GetExtension(url[0]);
             if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
             {
+                // if imported file is an image, create new project data
                 currentMetadata = dataHandler.CreateMetadata(CurrentVersion);
                 currentData = dataHandler.CreateFreshProject(url[0]);
                 currentSavePath = "";
@@ -183,6 +139,7 @@ namespace FileManagement
             }
             else if(extension == ".cosw")
             {
+                // if imported file is a save, use imported data
                 ImportData import = importHandler.ImportExistingProject(url[0], defaultData);
                 if(import.metadata == null || import.data == null) { Debug.LogWarning("Importing data failed! TODO - error screen"); return; }
                 currentMetadata = import.metadata;
@@ -195,16 +152,14 @@ namespace FileManagement
                 return;
             }
 
-            UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
-            UserInterfaceHandler.instance.SetLabel(filenameLabelId, currentData.fileName);
+            UserInterfaceHandler.instance.AssignVisualElementBackground(userInterfaceIdentifiers.originalSpriteId, currentData.originalTexture);
+            UserInterfaceHandler.instance.SetLabel(userInterfaceIdentifiers.filenameLabelId, currentData.fileName);
 
             EvaluateColorVariants();
             EvaluateColorEntries();
 
-            UpdateShaderInfo();
-            UpdateShaderImage();
+            toolUserInterfaceHandler.UpdateProcessedImage(currentData, shaderMaterial);
         }
-
         private void OnExportButtonPressed()
         {
             // format a default file name
@@ -215,10 +170,6 @@ namespace FileManagement
             string url = GetSavePath("Export file", Application.persistentDataPath, defaultName, null);
             if(url == "") { return; }
             Debug.Log($"Path selected: {url}");
-
-            //var url = StandaloneFileBrowser.SaveFilePanel("Open File", Application.persistentDataPath, defaultName, "");
-            //if (url.Length == 0) { Debug.LogWarning($"No url selected"); return; }
-            //if (File.Exists(url)) { Debug.LogWarning($"File already exists at path! cancelling export"); return; }
 
             // get the textures to export 
             ExportOptions exportOptions = currentData.exportOptions;
@@ -240,7 +191,6 @@ namespace FileManagement
 
             exportHandler.Export(url, texturesToExport, exportOptions.fileType);
         }
-
         private void OnSaveButtonPressed()
         {
             if(currentData == null) { return; }
@@ -264,6 +214,7 @@ namespace FileManagement
             currentSavePath = path;
         }
 
+        // file path -------------------------------------------------
         private string GetSavePath(string title, string directory, string defaultName, ExtensionFilter[] extensions)
         {
             var url = StandaloneFileBrowser.SaveFilePanel("Open File", directory, defaultName, extensions);
@@ -272,60 +223,12 @@ namespace FileManagement
             return url;
         }
 
-        private void OnAddVariantButtonClicked()
-        {
-            if(currentData == null) { return; }
-
-            // handle ui
-            Debug.Log("Add variant clicked!");
-            int variantIndex = currentData.colorVariants.Count;
-            string desiredKey = variantButtonDefaultId + variantIndex;
-            currentData.variantButtonIndexStrings.Add(variantIndex, desiredKey);
-            UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
-
-            UserInterfaceHandler.instance.AddButtonRef(desiredKey);
-            UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
-            UserInterfaceHandler.instance.AddButtonListener<int>(desiredKey, OnVariantButtonClicked, variantIndex);
-
-            // create new variant
-            currentData.colorVariants.Add(new ColorVariant(desiredKey, currentData.originalColors));
-        }
-        private void OnRemoveVariantButtonClicked()
-        {
-            Debug.Log("Remove variant clicked!");
- 
-        }
-        private void OnVariantButtonClicked(int index)
-        {
-            SelectVariant(index);
-        }
-        private void SelectVariant(int index)
-        {
-            currentData.selectedIndex = index;
-            onColorDataChange?.Invoke();
-        }
-
-        private void EvaluateColorVariants()
-        {
-            //currentData.variantButtonIndexStrings.Clear();
-
-            for(int i = 0; i < currentData.colorVariants.Count; i++)
-            {
-                int variantIndex = i;
-                string desiredKey = variantButtonDefaultId + variantIndex;
-                currentData.variantButtonIndexStrings.Add(variantIndex, desiredKey);
-                UserInterfaceHandler.instance.InsertButtonIntoVisualElement(variantButtonAreaId, variantButtonDefaultId, desiredKey, variantButtonTemplate);
-                UserInterfaceHandler.instance.AddButtonRef(desiredKey);
-                UserInterfaceHandler.instance.SetButtonLabel(desiredKey, variantIndex.ToString());
-                UserInterfaceHandler.instance.AddButtonListener<int>(desiredKey, OnVariantButtonClicked, variantIndex);
-            }
-        }
-
+        // exporting -------------------------------------------------
         private void OnExportContentChange(ChangeEvent<string> evt)
         {
             if(currentData == null) { return; }
 
-            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(exportContentDropdownId);
+            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(userInterfaceIdentifiers.exportContentDropdownId);
 
             switch(selectedIndex)
             {
@@ -342,12 +245,11 @@ namespace FileManagement
 
             Debug.Log($"CurrentData export settings; content: {currentData.exportOptions.content}, filetype: {currentData.exportOptions.fileType}");
         }
-
         private void OnExportFiletypeChange(ChangeEvent<string> evt)
         {
             if (currentData == null) { return; }
 
-            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(exportFiletypeDropdownId);
+            int selectedIndex = UserInterfaceHandler.instance.GetDropdownValue(userInterfaceIdentifiers.exportFiletypeDropdownId);
 
             switch (selectedIndex)
             {
@@ -371,7 +273,6 @@ namespace FileManagement
             Texture2D texture = TextureUtils.GetShaderTexture(currentData.originalTexture, tempMaterial);
             return new Texture2D[1] { texture };
         }
-
         private Texture2D[] GetAllTextures()
         {
             Texture2D[] textures = new Texture2D[currentData.colorVariants.Count];
@@ -386,7 +287,6 @@ namespace FileManagement
             }
             return textures;
         }
-
         private Texture2D[] GetSpriteSheetTexture()
         {
             // get all textures for in the spritesheet
@@ -395,6 +295,14 @@ namespace FileManagement
             return new Texture2D[1] { TextureUtils.CreateTextureSheet(textures) };
         }
 
+        // static user interface ------------------------------------
+        private void OnColorDataChange()
+        {
+            toolUserInterfaceHandler.UpdateColorEntryButtons(currentData.originalColors.Length, currentData.colorVariants[currentData.selectedIndex].newColors);
+            toolUserInterfaceHandler.UpdateProcessedImage(currentData, shaderMaterial);
+        }
+
+        // dynamic ui ------------------------------------------------
         private void EvaluateColorEntries()
         {
             for(int i = 0; i < currentData.originalColors.Length; i++)
@@ -403,40 +311,52 @@ namespace FileManagement
 
                 // Create ui from template
                 int colorIndex = i;
-                string desiredKey = colorEntryDefaultId + i;
+                string desiredKey = userInterfaceIdentifiers.colorEntryDefaultId + i;
                 currentData.variantColorEntryIndexStrings.Add(colorIndex, desiredKey);
-
-                TemplateContainer template = colorEntryTemplate.CloneTree();
-                
-                // get and give every element that needs to be accessed later an identifiable name
-                VisualElement originalColorElement = template.Q<VisualElement>(colorEntryOriginalColorDefaultId);
-                originalColorElement.name = colorEntryOriginalColorDefaultId + i;
-
-                Label colorIndexLabel = template.Q<Label>(colorEntryIndexLabelDefaultId);
-                colorIndexLabel.name = colorEntryIndexLabelDefaultId + i;
-
-                Button newColorButton = template.Q<Button>(colorEntryNewColorButtonDefaultId);
-                newColorButton.name = colorEntryNewColorButtonDefaultId + i;
-
-                UserInterfaceHandler.instance.InsertElementIntoScrollView(colorEntryScrollViewId, colorEntryDefaultId, desiredKey, template);
-                UserInterfaceHandler.instance.AddVisualElementRef(desiredKey);
-
-                // handle ui
-                UserInterfaceHandler.instance.AddVisualElementRef(colorEntryOriginalColorDefaultId + i);
-                UserInterfaceHandler.instance.SetVisualElementBackgroundColor(colorEntryOriginalColorDefaultId + i, currentData.originalColors[i]);
-                UserInterfaceHandler.instance.RemoveVisualElementRef(colorEntryOriginalColorDefaultId + i); // get rid of the reference if not needed anymore
-
-                UserInterfaceHandler.instance.AddLabelRef(colorEntryIndexLabelDefaultId + i);
-                UserInterfaceHandler.instance.SetLabel(colorEntryIndexLabelDefaultId + i, i.ToString());
-                UserInterfaceHandler.instance.RemoveLabelRef(colorEntryIndexLabelDefaultId + i); // get rid of the reference if not needed anymore
-
-                UserInterfaceHandler.instance.AddButtonRef(colorEntryNewColorButtonDefaultId + i);
-                UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + i, currentData.originalColors[i]);
-                UserInterfaceHandler.instance.AddButtonListener<int>(colorEntryNewColorButtonDefaultId + i, OnChangeColorButtonClicked, i);
-                //Debug.Log($"Original color; index: {colorIndex}, Color: {currentData.originalColors[colorIndex]}");
+                toolUserInterfaceHandler.CreateColorEntry(colorIndex, desiredKey, currentData.originalColors[colorIndex], OnChangeColorButtonClicked);
+            }
+        }
+        private void EvaluateColorVariants()
+        {
+            for(int i = 0; i < currentData.colorVariants.Count; i++)
+            {
+                int variantIndex = i;
+                string desiredKey = userInterfaceIdentifiers.variantButtonDefaultId + variantIndex;
+                currentData.variantButtonIndexStrings.Add(variantIndex, desiredKey);
+                toolUserInterfaceHandler.CreateVariantButton(variantIndex, desiredKey, OnVariantButtonClicked);
             }
         }
 
+        // color variants
+        private void OnAddVariantButtonClicked()
+        {
+            if(currentData == null) { return; }
+
+            // handle ui
+            Debug.Log("Add variant clicked!");
+            int variantIndex = currentData.colorVariants.Count;
+            string desiredKey = userInterfaceIdentifiers.variantButtonDefaultId + variantIndex;
+            toolUserInterfaceHandler.CreateVariantButton(variantIndex, desiredKey, OnVariantButtonClicked);
+
+            // create new variant
+            currentData.colorVariants.Add(new ColorVariant(desiredKey, currentData.originalColors));
+        }
+        private void OnRemoveVariantButtonClicked()
+        {
+            Debug.Log("Remove variant clicked!");
+ 
+        }
+        private void OnVariantButtonClicked(int index)
+        {
+            SelectVariant(index);
+        }
+        private void SelectVariant(int index)
+        {
+            currentData.selectedIndex = index;
+            onColorDataChange?.Invoke();
+        }
+
+        // color picker
         private void OnChangeColorButtonClicked(int index)
         {
             Debug.Log($"Clicked color index button: {index}");
@@ -445,7 +365,6 @@ namespace FileManagement
             colorPicker.Open(currentData.colorVariants[currentData.selectedIndex].newColors[index], index);
             colorPicker.AddColorListener(OnColorPickerClosed);
         }
-
         private void OnColorPickerClosed(Color32 color, int index)
         {
             colorPicker.RemoveColorListener(OnColorPickerClosed);
@@ -457,75 +376,8 @@ namespace FileManagement
             currentData.colorVariants[currentData.selectedIndex].newColors[index] = color;
             onColorDataChange?.Invoke();
         }
-
-        private void UpdateUserInterface(DataHolder data)
-        {
-            UserInterfaceHandler.instance.AssignVisualElementBackground(originalSpriteId, currentData.originalTexture);
-
-            Texture2D processedTexture = TextureUtils.GetShaderTexture(data.originalTexture, shaderMaterial);
-            processedTexture.filterMode = FilterMode.Point;
-            UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
-
-            UserInterfaceHandler.instance.SetLabel(filenameLabelId , data.fileName);
-        }
-
-        private void OnColorDataChange()
-        {
-            UpdateColorEntryButtons();
-            UpdateShaderInfo();
-            UpdateShaderImage();
-        }
-        private void UpdateColorEntryButtons()
-        {
-            for(int i = 0; i < currentData.originalColors.Length; i++)
-            {
-                UserInterfaceHandler.instance.SetButtonBackgroundColor(colorEntryNewColorButtonDefaultId + i, currentData.colorVariants[currentData.selectedIndex].newColors[i]);
-            }
-        }
-        private void UpdateShaderInfo()
-        {
-            Texture2D baseTexture = TextureUtils.CreateColorTexture1D(currentData.originalColors);
-            baseTexture.filterMode = FilterMode.Point;
-            shaderMaterial.SetTexture("_BaseColors", baseTexture);
-
-            Texture2D outputTexture = TextureUtils.CreateColorTexture1D(currentData.colorVariants[currentData.selectedIndex].newColors);
-            outputTexture.filterMode = FilterMode.Point;
-            shaderMaterial.SetTexture("_OutputColors", outputTexture);
-        }
-
-        private void UpdateShaderImage()
-        {
-            Texture2D processedTexture = TextureUtils.GetShaderTexture(currentData.originalTexture, shaderMaterial);
-            processedTexture.filterMode = FilterMode.Point;
-            UserInterfaceHandler.instance.AssignVisualElementBackground(processedSpriteId, processedTexture);
-        }
-
-        private void ClearDynamicUserInterface()
-        {
-            if(currentData == null) { return; }
-
-            // clean up dynamic ui listeners (and other garbage)
-            for (int i = 0; i < currentData.originalColors.Length; i++)
-            {
-                UserInterfaceHandler.instance.RemoveButtonListener<int>(colorEntryNewColorButtonDefaultId + i.ToString());
-                UserInterfaceHandler.instance.RemoveButtonRef(colorEntryNewColorButtonDefaultId + i.ToString());
-                UserInterfaceHandler.instance.RemoveVisualElementRef(colorEntryDefaultId + i.ToString());
-            }
-
-            // remove all color variants
-            for(int i = 0; i < currentData.colorVariants.Count; i++)
-            {
-                // remove any references
-                UserInterfaceHandler.instance.RemoveButtonListener<int>(variantButtonDefaultId + i.ToString());
-                UserInterfaceHandler.instance.RemoveButtonRef(variantButtonDefaultId + i.ToString());
-
-            }
-
-            UserInterfaceHandler.instance.ClearVisualElement(variantButtonAreaId);
-            UserInterfaceHandler.instance.ClearScrollView(colorEntryScrollViewId);
-        }
-
-        // editor button methods
+        
+        // custom editor buttons ------------------------------------
         public void IncrementMajorVersion() { majorVersion++; }
         public void DecrementMajorVersion() { majorVersion--; }
         public void IncrementMinorVersion() { minorVersion++; }
