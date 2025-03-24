@@ -9,6 +9,7 @@ using System.Linq;
 public class ColorPicker
 {
     [SerializeField] private Color32 selectedColor;
+    [SerializeField] private Color32 originalColor;
 
     [SerializeField] private string colorPickerId = "Element_ColorPickerBackground";
 
@@ -21,11 +22,16 @@ public class ColorPicker
     [SerializeField] private string redIntegerFieldId = "IntegerField_ColorPicker_Red";
     [SerializeField] private string greenIntegerFieldId = "IntegerField_ColorPicker_Green";
     [SerializeField] private string blueIntegerFieldId = "IntegerField_ColorPicker_Blue";
+
     [SerializeField] private string hexTextFieldId = "TextField_ColorPicker_Hex";
+    [SerializeField] private string lightenButtonId = "Button_ColorPicker_Lighten";
+    [SerializeField] private string darkenButtonId = "Button_ColorPicker_Darken";
+    [SerializeField] private string resetButtonId = "Button_ColorPicker_Reset";
 
     [SerializeField] private string applyButtonId = "Button_ColorPicker_Apply";
     [SerializeField] private string cancelButtonId = "Button_ColorPicker_Cancel";
 
+    [SerializeField][Range(1, 255)] private int colorAdjustJump = 10;
     private int redValue;
     private int greenValue;
     private int blueValue;
@@ -38,7 +44,6 @@ public class ColorPicker
 
     public void Initialize()
     {
-
         UserInterfaceHandler.instance.AddVisualElementRef(colorPickerId);
 
         UserInterfaceHandler.instance.AddVisualElementRef(oldColorIndicatorId);
@@ -64,17 +69,41 @@ public class ColorPicker
 
         UserInterfaceHandler.instance.AddTextFieldListener(hexTextFieldId, OnTextFieldValueChanged);
 
+        UserInterfaceHandler.instance.AddButtonRef(lightenButtonId);
+        UserInterfaceHandler.instance.AddButtonRef(darkenButtonId);
+        UserInterfaceHandler.instance.AddButtonRef(resetButtonId);
+
         UserInterfaceHandler.instance.AddButtonRef(applyButtonId);
         UserInterfaceHandler.instance.AddButtonRef(cancelButtonId);
 
 
         UserInterfaceHandler.instance.HideVisualElement(colorPickerId);
     }
+    private void ApplyButtonListeners()
+    {
+        UserInterfaceHandler.instance.AddButtonListener(lightenButtonId, OnLightenButtonClicked);
+        UserInterfaceHandler.instance.AddButtonListener(darkenButtonId, OnDarkenButtonClicked);
+        UserInterfaceHandler.instance.AddButtonListener(resetButtonId, OnResetButtonClicked);
 
-    public void Open(Color32 openingColor, int index)
+        UserInterfaceHandler.instance.AddButtonListener(applyButtonId, OnApplyButtonClicked);
+        UserInterfaceHandler.instance.AddButtonListener(cancelButtonId, OnCancelButtonClicked);
+    }
+    private void RemoveButtonListeners()
+    {
+        UserInterfaceHandler.instance.RemoveButtonListener(lightenButtonId, OnLightenButtonClicked);
+        UserInterfaceHandler.instance.RemoveButtonListener(darkenButtonId, OnDarkenButtonClicked);
+        UserInterfaceHandler.instance.RemoveButtonListener(resetButtonId, OnResetButtonClicked);
+
+        UserInterfaceHandler.instance.RemoveButtonListener(applyButtonId, OnApplyButtonClicked);
+        UserInterfaceHandler.instance.RemoveButtonListener(cancelButtonId, OnCancelButtonClicked);
+    }
+
+    public void Open(Color32 openingColor, Color32 originalColor, int index)
     {
         isOpen = true;
         colorIndex = index;
+        this.originalColor = originalColor;
+
         UserInterfaceHandler.instance.ShowVisualElement(colorPickerId);
 
         // set all values to openingColor
@@ -88,19 +117,24 @@ public class ColorPicker
 
         UpdateColorSettings();
 
-        UserInterfaceHandler.instance.AddButtonListener(applyButtonId, OnApplyButtonClicked);
-        UserInterfaceHandler.instance.AddButtonListener(cancelButtonId, OnCancelButtonClicked);
+        ApplyButtonListeners();
 
         selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
         Debug.Log($"New selected color is {selectedColor}");
+    }
+
+    private void Close()
+    {
+        UserInterfaceHandler.instance.HideVisualElement(colorPickerId);
+        isOpen = false;
+        onPickerClosed?.Invoke(selectedColor, colorIndex);
     }
 
     public void OnApplyButtonClicked()
     {
         Debug.Log($"Confirming color picked");
 
-        UserInterfaceHandler.instance.RemoveButtonListener(applyButtonId, OnApplyButtonClicked);
-        UserInterfaceHandler.instance.RemoveButtonListener(cancelButtonId, OnCancelButtonClicked);
+        RemoveButtonListeners();
 
         Close();
     }
@@ -109,18 +143,52 @@ public class ColorPicker
     {
         Debug.Log($"Cancelling color picked");
 
-        UserInterfaceHandler.instance.RemoveButtonListener(applyButtonId, OnApplyButtonClicked);
-        UserInterfaceHandler.instance.RemoveButtonListener(cancelButtonId, OnCancelButtonClicked);
+        RemoveButtonListeners();
 
         selectedColor = new Color(0, 0, 0, 0);
         Close();
     }
 
-    private void Close()
+    private void OnLightenButtonClicked()
     {
-        UserInterfaceHandler.instance.HideVisualElement(colorPickerId);
-        isOpen = false;
-        onPickerClosed?.Invoke(selectedColor, colorIndex);
+        redValue += colorAdjustJump;
+        if(redValue > 255) { redValue = 255; }
+        greenValue += colorAdjustJump;
+        if(greenValue > 255) { greenValue = 255; }
+        blueValue += colorAdjustJump;
+        if(blueValue > 255) { blueValue = 255; }
+
+        UpdateColorSettings();
+
+        selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
+        SetNewColorIndicator(selectedColor);
+    }
+
+    private void OnDarkenButtonClicked()
+    {
+        redValue -= colorAdjustJump;
+        if (redValue < 0) { redValue = 0; }
+        greenValue -= colorAdjustJump;
+        if (greenValue < 0) { greenValue = 0; }
+        blueValue -= colorAdjustJump;
+        if (blueValue < 0) { blueValue = 0; }
+
+        UpdateColorSettings();
+
+        selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
+        SetNewColorIndicator(selectedColor);
+    }
+
+    private void OnResetButtonClicked()
+    {
+        redValue = originalColor.r;
+        greenValue = originalColor.g;
+        blueValue = originalColor.b;
+
+        UpdateColorSettings();
+
+        selectedColor = originalColor;
+        SetNewColorIndicator(selectedColor);
     }
 
     private void OnTextFieldValueChanged(ChangeEvent<string> evt)

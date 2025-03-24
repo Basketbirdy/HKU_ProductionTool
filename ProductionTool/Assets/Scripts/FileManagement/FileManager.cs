@@ -362,7 +362,7 @@ namespace FileManagement
             Debug.Log($"Clicked color index button: {index}");
             if (colorPicker.GetState()) { colorPicker.OnCancelButtonClicked(); }
 
-            colorPicker.Open(currentData.colorVariants[currentData.selectedIndex].newColors[index], index);
+            colorPicker.Open(currentData.colorVariants[currentData.selectedIndex].newColors[index], currentData.originalColors[index], index);
             colorPicker.AddColorListener(OnColorPickerClosed);
         }
         private void OnColorPickerClosed(Color32 color, int index)
