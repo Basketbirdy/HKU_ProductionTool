@@ -6,19 +6,67 @@
     -unity-font-style: normal;
     font-size: 30px;
     border-top-left-radius: 0;
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
-    border-bottom-left-radius: 16px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
     border-top-width: 8px;
-    border-right-width: 8px;
+    border-right-width: 0;
     border-bottom-width: 8px;
-    border-left-width: 8px;
-    border-left-color: rgb(106, 106, 106);
-    border-right-color: rgb(106, 106, 106);
-    border-top-color: rgb(106, 106, 106);
-    border-bottom-color: rgb(106, 106, 106);
-    background-color: rgb(240, 240, 240);
+    border-left-width: 0;
+    border-left-color: rgb(56, 56, 56);
+    border-right-color: rgb(56, 56, 56);
+    border-top-color: rgb(56, 56, 56);
+    border-bottom-color: rgb(56, 56, 56);
+    background-color: rgb(66, 66, 66);
     transition-duration: 0.2s;
+    color: rgb(255, 255, 255);
+}
+
+.button:hover {
+    transition-duration: 0.35s;
+    border-top-width: 8px;
+    border-right-width: 0;
+    border-bottom-width: 8px;
+    border-left-width: 0;
+    border-left-color: rgba(255, 255, 255, 0.15);
+    border-right-color: rgba(255, 255, 255, 0.15);
+    border-top-color: rgba(255, 255, 255, 0.15);
+    border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.button-square {
+    height: 100%;
+    width: 25%;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    border-left-color: rgb(56, 56, 56);
+    border-right-color: rgb(56, 56, 56);
+    border-top-color: rgb(56, 56, 56);
+    border-bottom-color: rgb(56, 56, 56);
+    font-size: 36px;
+    background-color: rgb(66, 66, 66);
+}
+
+.button-square:hover {
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    border-left-color: rgba(255, 255, 255, 0.05);
+    border-right-color: rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+    transition-duration: 0.35s;
 }
 
 .column {
@@ -48,17 +96,6 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-}
-
-.interactable {
-}
-
-.interactable:hover {
-    transition-duration: 0.2s;
-    border-left-color: rgb(167, 79, 60);
-    border-right-color: rgb(167, 79, 60);
-    border-top-color: rgb(167, 79, 60);
-    border-bottom-color: rgb(167, 79, 60);
 }
 
 .unity-base-field {

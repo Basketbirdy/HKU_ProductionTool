@@ -1,0 +1,29 @@
+.button-square {
+    background-color: rgb(66, 66, 66);
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    border-left-color: rgb(56, 56, 56);
+    border-right-color: rgb(56, 56, 56);
+    border-top-color: rgb(56, 56, 56);
+    border-bottom-color: rgb(56, 56, 56);
+    transition-duration: 0.2s;
+    height: 15%;
+    width: 25%;
+    align-self: flex-start;
+    max-width: 25%;
+    max-height: 15%;
+}
+
+.button-square:hover {
+    border-left-color: rgba(255, 255, 255, 0.05);
+    border-right-color: rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+    transition-duration: 0.35s;
+    width: 25%;
+    height: 15%;
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/Fonts/Lexend-VariableFont_wght.ttf?fileID=12800000&guid=2e07b0bd6dbba3447810a1577ead809e&type=3#Lexend-VariableFont_wght");
+    align-self: flex-start;
+}
