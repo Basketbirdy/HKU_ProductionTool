@@ -101,3 +101,8 @@
     border-bottom-left-radius: 16px;
     flex-grow: 1;
 }
+
+.test > .unity-label {
+    min-width: 24%;
+    color: rgb(236, 236, 236);
+}

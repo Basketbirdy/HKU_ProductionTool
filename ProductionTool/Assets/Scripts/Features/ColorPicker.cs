@@ -31,11 +31,6 @@ public class ColorPicker
     private int blueValue;
     private int alphaValue = 255;
 
-    private char[] hexChars = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F' };
-    Dictionary<char, int> charValues = new Dictionary<char, int>();
-    Dictionary<int, char> valueChars = new Dictionary<int, char>();
-
-
     // state
     private bool isOpen;
     private int colorIndex;
@@ -43,16 +38,6 @@ public class ColorPicker
 
     public void Initialize()
     {
-        hexChars = new[]
-        {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            'a', 'b', 'c', 'd', 'e', 'f',
-        };
-        for (int i = 0; i < hexChars.Length; i++)
-        {
-            charValues.Add(hexChars[i], i);
-            valueChars.Add(i, hexChars[i]);
-        }
 
         UserInterfaceHandler.instance.AddVisualElementRef(colorPickerId);
 
@@ -67,7 +52,7 @@ public class ColorPicker
         UserInterfaceHandler.instance.AddIntegerFieldRef(greenIntegerFieldId);
         UserInterfaceHandler.instance.AddIntegerFieldRef(blueIntegerFieldId);
 
-        //UserInterfaceHandler.instance.AddTextFieldRef(hexTextFieldId);
+        UserInterfaceHandler.instance.AddTextFieldRef(hexTextFieldId);
 
         UserInterfaceHandler.instance.AddSliderIntListener(redSliderId, OnSliderValueChanged);
         UserInterfaceHandler.instance.AddSliderIntListener(greenSliderId, OnSliderValueChanged);
@@ -77,10 +62,11 @@ public class ColorPicker
         UserInterfaceHandler.instance.AddIntegerFieldListener(greenIntegerFieldId, OnIntegerFieldValueChanged);
         UserInterfaceHandler.instance.AddIntegerFieldListener(blueIntegerFieldId, OnIntegerFieldValueChanged);
 
+        UserInterfaceHandler.instance.AddTextFieldListener(hexTextFieldId, OnTextFieldValueChanged);
+
         UserInterfaceHandler.instance.AddButtonRef(applyButtonId);
         UserInterfaceHandler.instance.AddButtonRef(cancelButtonId);
 
-        //UserInterfaceHandler.instance.AddTextFieldListener(hexTextFieldId, OnTextFieldValueChanged);
 
         UserInterfaceHandler.instance.HideVisualElement(colorPickerId);
     }
@@ -100,8 +86,7 @@ public class ColorPicker
         blueValue = openingColor.b;
         alphaValue = 255;
 
-        SetColorSliders();
-        SetColorIntegerFields();
+        UpdateColorSettings();
 
         UserInterfaceHandler.instance.AddButtonListener(applyButtonId, OnApplyButtonClicked);
         UserInterfaceHandler.instance.AddButtonListener(cancelButtonId, OnCancelButtonClicked);
@@ -140,79 +125,75 @@ public class ColorPicker
 
     private void OnTextFieldValueChanged(ChangeEvent<string> evt)
     {
-        string newValue = evt.newValue;
+        string input = evt.newValue;
+        if(input.Length < 6) { return; }
 
-        bool isValid = true;
-        foreach (char c in newValue)
+        if(input.Length > 6) 
         {
-            if (hexChars.Contains(c))
+            Debug.Log($"first input char: {input[0]}");
+            if (input[0] != '#') { return; }
+            string newInput = "";
+            for(int i = 1; i < input.Length; i++)
             {
-                isValid = false;
-                break;
+                newInput += input[i];
             }
-
-            if (!charValues.ContainsKey(c))
-            {
-                isValid = false;
-                break;
-            }
-        }
-        if (newValue.Length > 6) { isValid = false; }
-
-        if (newValue.Length < 6)
-        {
-            int unfilled = 6 - newValue.Length;
-            for (int i = 6; i > newValue.Length; i--)
-            {
-                newValue += 0.ToString();
-            }
+            input = newInput;
         }
 
-        if (!isValid)
-        {
-            UserInterfaceHandler.instance.SetTextFieldValueWithoutNotify(hexTextFieldId, evt.previousValue);
-            return;
-        }
+        Color newColor = HexToColor(input);
+        redValue = Mathf.RoundToInt(newColor.r * 255);
+        greenValue = Mathf.RoundToInt(newColor.g * 255);
+        blueValue = Mathf.RoundToInt(newColor.b * 255);
 
-        selectedColor = HexToColor(newValue);
+        UpdateColorSettings(2);
 
-        RecalculateValues();
+        selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
+        SetNewColorIndicator(selectedColor);
     }
 
     private Color HexToColor(string hex)
     {
-        int r1 = charValues[hex[0]];
-        int r2 = charValues[hex[1]];
-        int r = (r1 * 16) + r2;
+        Color newCol;
+        ColorUtility.TryParseHtmlString("#" + hex, out newCol);
+        newCol.a = alphaValue;
+        return newCol;
 
-        int g1 = charValues[hex[2]];
-        int g2 = charValues[hex[3]];
-        int g = (g1 * 16) + g2;
+        //int r1 = charValues[hex[0]];
+        //int r2 = charValues[hex[1]];
+        //int r = (r1 * 16) + r2;
 
-        int b1 = charValues[hex[4]];
-        int b2 = charValues[hex[5]];
-        int b = (b1 * 16) + b2;
+        //int g1 = charValues[hex[2]];
+        //int g2 = charValues[hex[3]];
+        //int g = (g1 * 16) + g2;
 
-        return new Color(r, g, b, 255);
+        //int b1 = charValues[hex[4]];
+        //int b2 = charValues[hex[5]];
+        //int b = (b1 * 16) + b2;
+
+        //return new Color(r, g, b, 255);
     }
-    private string ColorToHex(Color32 color)
+    private string ColorToHex(Color color)
     {
-        int r1 = Mathf.FloorToInt(color.r / 16);
-        int r2 = color.r % 16;
-        char red1 = valueChars[r1];
-        char red2 = valueChars[r2];
+        color.a = alphaValue;
+        string newHex = ColorUtility.ToHtmlStringRGB(color);
+        return newHex;
 
-        int g1 = Mathf.FloorToInt(color.g / 16);
-        int g2 = color.g % 16;
-        char green1 = valueChars[g1];
-        char green2 = valueChars[g2];
+        //int r1 = Mathf.FloorToInt(color.r / 16);
+        //int r2 = color.r % 16;
+        //char red1 = valueChars[r1];
+        //char red2 = valueChars[r2];
 
-        int b1 = Mathf.FloorToInt(color.b / 16);
-        int b2 = color.g % 16;
-        char blue1 = valueChars[b1];
-        char blue2 = valueChars[b2];
+        //int g1 = Mathf.FloorToInt(color.g / 16);
+        //int g2 = color.g % 16;
+        //char green1 = valueChars[g1];
+        //char green2 = valueChars[g2];
 
-        return string.Join("", red1, red2, green1, green2, blue1, blue2);
+        //int b1 = Mathf.FloorToInt(color.b / 16);
+        //int b2 = color.g % 16;
+        //char blue1 = valueChars[b1];
+        //char blue2 = valueChars[b2];
+
+        //return string.Join("", red1, red2, green1, green2, blue1, blue2);
     }
 
     private void OnSliderValueChanged(ChangeEvent<int> evt)
@@ -223,8 +204,7 @@ public class ColorPicker
         greenValue = UserInterfaceHandler.instance.GetSliderIntValue(greenSliderId);
         blueValue = UserInterfaceHandler.instance.GetSliderIntValue(blueSliderId);
 
-        SetColorSliders();
-        SetColorIntegerFields();
+        UpdateColorSettings(0);
 
         selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
         Debug.Log($"New selected color is {selectedColor}");
@@ -240,8 +220,7 @@ public class ColorPicker
         greenValue = UserInterfaceHandler.instance.GetIntegerFieldValue(greenIntegerFieldId);
         blueValue = UserInterfaceHandler.instance.GetIntegerFieldValue(blueIntegerFieldId);
 
-        SetColorSliders();
-        SetColorIntegerFields();
+        UpdateColorSettings(1);
 
         selectedColor = new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue);
         Debug.Log($"New selected color is {selectedColor}");
@@ -249,18 +228,11 @@ public class ColorPicker
         SetNewColorIndicator(selectedColor);
     }
 
-    private void RecalculateValues()
+    private void UpdateColorSettings(int ignoreIndex = 999)
     {
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(redSliderId, selectedColor.r);
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(redIntegerFieldId, selectedColor.r);
-
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(greenSliderId, selectedColor.g);
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(greenIntegerFieldId, selectedColor.g);
-
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(blueSliderId, selectedColor.b);
-        UserInterfaceHandler.instance.SetSliderIntValueWithoutNotify(blueIntegerFieldId, selectedColor.b);
-
-        UserInterfaceHandler.instance.SetTextFieldValueWithoutNotify(hexTextFieldId, ColorToHex(selectedColor));
+        if(ignoreIndex != 0) { SetColorSliders(); }
+        if(ignoreIndex != 1) { SetColorIntegerFields(); }
+        if(ignoreIndex != 2) { SetColorTextField(); }
     }
 
     private void SetColorSliders()
@@ -275,6 +247,11 @@ public class ColorPicker
         UserInterfaceHandler.instance.SetIntegerFieldValueWithoutNotify(redIntegerFieldId, redValue);
         UserInterfaceHandler.instance.SetIntegerFieldValueWithoutNotify(greenIntegerFieldId, greenValue);
         UserInterfaceHandler.instance.SetIntegerFieldValueWithoutNotify(blueIntegerFieldId, blueValue);
+    }
+
+    private void SetColorTextField()
+    {
+        UserInterfaceHandler.instance.SetTextFieldValueWithoutNotify(hexTextFieldId, ColorToHex(new Color32((byte)redValue, (byte)greenValue, (byte)blueValue, (byte)alphaValue)));
     }
 
     private void SetNewColorIndicator(Color color)
