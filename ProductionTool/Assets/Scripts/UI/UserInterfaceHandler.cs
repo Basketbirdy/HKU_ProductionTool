@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Accessibility;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
@@ -83,6 +84,17 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!visualElements.ContainsKey(key)) { return; }
         Debug.Log($"Setting background color to: {color}");
         visualElements[key].style.backgroundColor = new StyleColor(color);
+    }
+    public void RegisterPointerDownCallbackVisualElement(string key, Action<PointerDownEvent> action)
+    {
+        if(!visualElements.ContainsKey(key)) { return; }
+        Debug.Log($"Registering pointerdown callback on {key}");
+        visualElements[key].RegisterCallback<PointerDownEvent>(evt => action.Invoke(evt));
+    }
+    public void UnregisterPointerDownCallbackVisualElement(string key, Action<PointerDownEvent> action)
+    {
+        if (!visualElements.ContainsKey(key)) { return; }
+        visualElements[key].UnregisterCallback<PointerDownEvent>(evt => action.Invoke(evt));
     }
     public void InsertButtonIntoVisualElement(string key, string buttonAssetKey, string desiredKey, VisualTreeAsset asset)
     {
