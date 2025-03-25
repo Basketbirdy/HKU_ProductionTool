@@ -353,6 +353,7 @@ namespace FileManagement
         private void SelectVariant(int index)
         {
             currentData.selectedIndex = index;
+            UserInterfaceHandler.instance.SetLabel(userInterfaceIdentifiers.selectedVariantLabelId, index.ToString());
             onColorDataChange?.Invoke();
         }
 

@@ -45,7 +45,7 @@ public class ToolUserInterfaceHandler
         UserInterfaceHandler.instance.AddVisualElementRef(ids.variantButtonAreaId);
             // labels - text
         UserInterfaceHandler.instance.AddLabelRef(ids.filenameLabelId);
-
+        UserInterfaceHandler.instance.AddLabelRef(ids.selectedVariantLabelId);
             // scrollviews
         UserInterfaceHandler.instance.AddScrollViewRef(ids.colorEntryScrollViewId);
     }
