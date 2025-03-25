@@ -37,6 +37,7 @@ namespace FileManagement
 
             // identify and store all unique colors
             newProjectData.originalColors = TextureUtils.GetUniqueColors(newProjectData.originalTexture);
+            newProjectData.originalColors = SortColors(newProjectData.originalColors);
 
             newProjectData.colorVariants = new List<ColorVariant>();
             newProjectData.colorVariants.Add(new ColorVariant("DefaultVariant", newProjectData.originalColors));
@@ -53,6 +54,32 @@ namespace FileManagement
             //metaData.version = version;
             //metaData.date = System.DateTime.Now.ToString();
             return metadata;
+        }
+
+        private Color[] SortColors(Color[] colors)
+        {
+            float H;
+            float h;
+            Color temp;
+
+            // bubble sort - Array is always < 256 so bubblesort performance impact is minimal.
+            for(int i = colors.Length - 1; i > 0; i--)
+            {
+                for(int j = 0; j < colors.Length - 1; j++) 
+                {
+                    Color.RGBToHSV(colors[j], out H, out float S, out float V);
+                    Color.RGBToHSV(colors[j + 1], out h, out float s, out float v);
+                    if(H > h)
+                    {
+                        // swap
+                        temp = colors[j + 1];
+                        colors[j + 1] = colors[j];
+                        colors[j] = temp;
+                    }
+                }
+            }
+
+            return colors;
         }
     }
 }
