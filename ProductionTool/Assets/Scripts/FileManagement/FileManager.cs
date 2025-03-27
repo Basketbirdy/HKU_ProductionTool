@@ -158,6 +158,7 @@ namespace FileManagement
             EvaluateColorVariants();
             EvaluateColorEntries();
 
+            toolUserInterfaceHandler.ResetOptions();
             toolUserInterfaceHandler.UpdateProcessedImage(currentData, shaderMaterial);
         }
         private void OnExportButtonPressed()

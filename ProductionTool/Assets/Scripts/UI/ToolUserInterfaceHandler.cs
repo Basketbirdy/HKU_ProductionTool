@@ -181,4 +181,10 @@ public class ToolUserInterfaceHandler
         UserInterfaceHandler.instance.ClearScrollView(ids.colorEntryScrollViewId);
     }
 
+    // resetting
+    public void ResetOptions()
+    {
+        UserInterfaceHandler.instance.SetDropdownIndex(ids.exportContentDropdownId, 0);
+        UserInterfaceHandler.instance.SetDropdownIndex(ids.exportFiletypeDropdownId, 0);
+    }
 }

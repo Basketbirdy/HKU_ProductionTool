@@ -191,6 +191,11 @@ public class UserInterfaceHandler : MonoBehaviour
         if (!dropdowns.ContainsKey(key)) { return -1; }
         return dropdowns[key].index;
     }
+    public void SetDropdownIndex(string key, int index)
+    {
+        if (!dropdowns.ContainsKey(key)) { return; }
+        dropdowns[key].index = index;
+    }
     public void AddDropdownListener(string key, Action<ChangeEvent<string>> action)
     {
         if (!dropdowns.ContainsKey(key)) { return; }

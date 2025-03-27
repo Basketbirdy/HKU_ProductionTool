@@ -8,6 +8,7 @@ namespace FileManagement
     {
         public void Export(string url, Texture2D[] textures, FileType fileType)
         {
+            if(url == null) { return; }
             if(textures == null || textures.Length == 0) { return; }
 
             // Check if the textures array contains multiple textures
@@ -52,14 +53,22 @@ namespace FileManagement
         {
             for(int i = 0; i < textures.Length; i++)
             {
-                string currentPath = path + i + ".png";
+                string currentPath = "";
+                if (Path.HasExtension(path)) { currentPath = path + i; }
+                else { currentPath = path + i + ".png"; }
+                if(currentPath == "") { return; }
+
                 byte[] bytes = ImageConversion.EncodeToPNG(textures[i]);
                 File.WriteAllBytes(currentPath, bytes);
             }
         }
         private void ExportAsPNG(string path, Texture2D texture)
         {
-            string currentPath = path + ".png";
+            string currentPath = "";
+            if (Path.HasExtension(path)) { currentPath = path; }
+            else { currentPath = path + ".png"; }
+            if (currentPath == "") { return; }
+
             byte[] bytes = ImageConversion.EncodeToPNG(texture);
             File.WriteAllBytes(currentPath, bytes);
         }
@@ -68,14 +77,22 @@ namespace FileManagement
         {
             for (int i = 0; i < textures.Length; i++)
             {
-                string currentPath = path + i + ".jpg";
+                string currentPath = "";
+                if (Path.HasExtension(path)) { currentPath = path + i; }
+                else { currentPath = path + i + ".jpg"; }
+                if (currentPath == "") { return; }
+
                 byte[] bytes = ImageConversion.EncodeToJPG(textures[i]);
                 File.WriteAllBytes(currentPath, bytes);
             }
         }
         private void ExportAsJPG(string path, Texture2D texture)
         {
-            string currentPath = path + ".jpg";
+            string currentPath = "";
+            if (Path.HasExtension(path)) { currentPath = path; }
+            else { currentPath = path + ".png"; }
+            if (currentPath == "") { return; }
+
             byte[] bytes = ImageConversion.EncodeToJPG(texture);
             File.WriteAllBytes(currentPath, bytes);
         }
